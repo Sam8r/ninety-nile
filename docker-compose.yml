@@ -1,0 +1,45 @@
+services:
+  mysql:
+    image: mysql:8
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: nn
+      MYSQL_DATABASE: ninetynile
+      MYSQL_USER: nn
+      MYSQL_PASSWORD: nn
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysqldata:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "nn", "-pnn"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: mysql://nn:nn@mysql:3306/ninetynile
+      AUTH_SECRET: ${AUTH_SECRET:-dev-only-secret-change-me-in-production-min32chars}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@ninetynile.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-ChangeMeNow123}
+      UPLOAD_DIR: /app/uploads
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      NODE_ENV: production
+    volumes:
+      - uploads:/app/uploads
+    ports:
+      - "3000:3000"
+    command: sh -c "npx prisma migrate deploy && node server.js"
+
+volumes:
+  mysqldata:
+  uploads:

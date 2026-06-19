@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Default brand palette (overridden at runtime by BrandSettings CSS vars).
+       Values below map to the seed brand: NinetyNile warm earth + nile-blue. */
+    --background: 30 33% 98%;
+    --foreground: 200 20% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 200 20% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 20% 12%;
+
+    --primary: 200 20% 12%;
+    --primary-foreground: 30 33% 98%;
+
+    --secondary: 30 20% 90%;
+    --secondary-foreground: 200 20% 12%;
+
+    --muted: 30 15% 94%;
+    --muted-foreground: 200 10% 40%;
+
+    --accent: 24 85% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 30 15% 88%;
+    --input: 30 15% 88%;
+    --ring: 24 85% 55%;
+
+    --radius: 0.5rem;
+
+    /* Brand tokens (hex, set dynamically via BrandSettings). */
+    --brand-primary: #1a202c;
+    --brand-secondary: #0e7490;
+    --brand-accent: #e8722a;
+    --brand-bg: #faf8f4;
+    --brand-text: #1a202c;
+
+    --font-heading: "Inter", system-ui, sans-serif;
+    --font-body: "Inter", system-ui, sans-serif;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+    background-color: var(--brand-bg);
+    color: var(--brand-text);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold tracking-tight;
+  }
+
+  /* Respect RTL: use logical properties throughout components. */
+  [dir="rtl"] {
+    text-align: right;
+  }
+}
+
+@layer utilities {
+  .container-prose {
+    @apply mx-auto max-w-3xl px-6;
+  }
+
+  .container-wide {
+    @apply mx-auto max-w-7xl px-6;
+  }
+
+  .prose-richtext {
+    @apply leading-relaxed text-muted-foreground;
+  }
+
+  .prose-richtext :where(p) {
+    @apply mb-4;
+  }
+
+  .prose-richtext :where(h2, h3) {
+    @apply mb-3 mt-6 font-heading font-semibold text-foreground;
+  }
+
+  .prose-richtext :where(ul, ol) {
+    @apply mb-4 ps-6;
+  }
+
+  .prose-richtext :where(ul) {
+    @apply list-disc;
+  }
+
+  .prose-richtext :where(ol) {
+    @apply list-decimal;
+  }
+
+  .prose-richtext :where(a) {
+    @apply text-accent underline underline-offset-4;
+  }
+}

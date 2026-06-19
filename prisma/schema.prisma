@@ -1,0 +1,334 @@
+// Prisma schema for NinetyNile — bilingual (EN/AR) agency website + admin dashboard.
+// Bilingual fields use paired columns: <field>En / <field>Ar.
+
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../node_modules/.prisma/client"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Role {
+  ADMIN
+  EDITOR
+}
+
+enum Status {
+  DRAFT
+  PUBLISHED
+}
+
+enum CaseStudyCategory {
+  FILM
+  MUSIC_VIDEO
+  DOCUMENTARY
+  TVC
+  ORIGINAL
+  CAMPAIGN
+  OTHER
+}
+
+enum MediaKind {
+  IMAGE
+  VIDEO_POSTER
+}
+
+enum ContactSubmissionStatus {
+  NEW
+  READ
+  SPAM
+}
+
+// ---------------------------------------------------------------------------
+// Auth
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique @db.VarChar(200)
+  passwordHash String
+  name         String   @db.VarChar(200)
+  role         Role     @default(EDITOR)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  caseStudies CaseStudy[]
+  projects    Project[]
+
+  @@map("users")
+}
+
+// ---------------------------------------------------------------------------
+// Media
+// ---------------------------------------------------------------------------
+
+model MediaAsset {
+  id         String    @id @default(uuid())
+  filename   String    @db.VarChar(500)
+  path       String    @db.VarChar(500)
+  mimeType   String    @db.VarChar(100)
+  kind       MediaKind @default(IMAGE)
+  width      Int?
+  height     Int?
+  sizeBytes  BigInt
+  altEn      String?   @db.Text
+  altAr      String?   @db.Text
+  createdAt  DateTime  @default(now())
+
+  caseStudyHeroes   CaseStudy[]
+  caseStudyGallery  CaseStudyMedia[]
+  projectHeroes     Project[]
+  teamPhotos        TeamMember[]
+  clientLogos       Client[]
+  brandPrimaryLogo  BrandSettings?   @relation("BrandPrimaryLogo")
+  brandAltLogo      BrandSettings?   @relation("BrandAltLogo")
+  brandMarkLogo     BrandSettings?   @relation("BrandMarkLogo")
+  siteContentMedia  SiteContent[]
+
+  @@map("media_assets")
+}
+
+// ---------------------------------------------------------------------------
+// Content: Case Studies & Projects
+// ---------------------------------------------------------------------------
+
+model CaseStudy {
+  id          String             @id @default(uuid())
+  slug        String             @unique @db.VarChar(80)
+  titleEn     String             @db.VarChar(200)
+  titleAr     String?            @db.VarChar(200)
+  clientEn    String?            @db.VarChar(200)
+  clientAr    String?            @db.VarChar(200)
+  summaryEn   String?            @db.Text
+  summaryAr   String?            @db.Text
+  challengeEn String?            @db.Text
+  challengeAr String?            @db.Text
+  solutionEn  String?            @db.Text
+  solutionAr  String?            @db.Text
+  resultsEn   String?            @db.Text
+  resultsAr   String?            @db.Text
+  category    CaseStudyCategory  @default(OTHER)
+  metrics     Json?
+  externalLinks Json?
+  order       Int                @default(0)
+  status      Status             @default(DRAFT)
+  publishedAt DateTime?
+
+  heroMediaId String?
+  heroMedia   MediaAsset?        @relation(fields: [heroMediaId], references: [id], onDelete: SetNull)
+
+  galleryItems CaseStudyMedia[]
+
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, order])
+  @@map("case_studies")
+}
+
+model CaseStudyMedia {
+  id          String @id @default(uuid())
+  caseStudyId String
+  mediaId     String
+  order       Int    @default(0)
+
+  caseStudy CaseStudy  @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  media     MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@index([caseStudyId, order])
+  @@map("case_study_media")
+}
+
+model Project {
+  id            String            @id @default(uuid())
+  slug          String            @unique @db.VarChar(80)
+  titleEn       String            @db.VarChar(200)
+  titleAr       String?           @db.VarChar(200)
+  descriptionEn String?           @db.Text
+  descriptionAr String?           @db.Text
+  externalLinks Json?
+  order         Int               @default(0)
+  status        Status            @default(DRAFT)
+  publishedAt   DateTime?
+
+  heroMediaId String?
+  heroMedia   MediaAsset?        @relation(fields: [heroMediaId], references: [id], onDelete: SetNull)
+
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, order])
+  @@map("projects")
+}
+
+// ---------------------------------------------------------------------------
+// Structured content
+// ---------------------------------------------------------------------------
+
+model Service {
+  id            String @id @default(uuid())
+  nameEn        String @db.VarChar(200)
+  nameAr        String? @db.VarChar(200)
+  descriptionEn String? @db.Text
+  descriptionAr String? @db.Text
+  icon          String? @db.VarChar(100)
+  order         Int    @default(0)
+
+  @@map("services")
+}
+
+model ProcessStep {
+  id            String @id @default(uuid())
+  labelEn       String @db.VarChar(200)
+  labelAr       String? @db.VarChar(200)
+  descriptionEn String? @db.Text
+  descriptionAr String? @db.Text
+  order         Int    @default(0)
+
+  @@map("process_steps")
+}
+
+model ProductionPhase {
+  id      String @id @default(uuid())
+  nameEn  String @db.VarChar(200)
+  nameAr  String? @db.VarChar(200)
+  bodyEn  String? @db.Text
+  bodyAr  String? @db.Text
+  order   Int    @default(0)
+
+  @@map("production_phases")
+}
+
+model EquipmentItem {
+  id       String @id @default(uuid())
+  labelEn  String @db.VarChar(200)
+  labelAr  String? @db.VarChar(200)
+  order    Int    @default(0)
+
+  @@map("equipment_items")
+}
+
+model TeamMember {
+  id      String  @id @default(uuid())
+  nameEn  String  @db.VarChar(200)
+  nameAr  String? @db.VarChar(200)
+  roleEn  String? @db.VarChar(200)
+  roleAr  String? @db.VarChar(200)
+  bioEn   String? @db.Text
+  bioAr   String? @db.Text
+  photoId String?
+  photo   MediaAsset? @relation(fields: [photoId], references: [id], onDelete: SetNull)
+  order   Int     @default(0)
+  status  Status  @default(DRAFT)
+
+  @@map("team_members")
+}
+
+model Client {
+  id     String @id @default(uuid())
+  name   String @db.VarChar(200)
+  url    String? @db.VarChar(500)
+  logoId String?
+  logo   MediaAsset? @relation(fields: [logoId], references: [id], onDelete: SetNull)
+  order  Int    @default(0)
+
+  @@map("clients")
+}
+
+model Testimonial {
+  id           String @id @default(uuid())
+  quoteEn      String @db.Text
+  quoteAr      String? @db.Text
+  authorName   String @db.VarChar(200)
+  authorRoleEn String? @db.VarChar(200)
+  authorRoleAr String? @db.VarChar(200)
+  org          String? @db.VarChar(200)
+  order        Int    @default(0)
+
+  @@map("testimonials")
+}
+
+// ---------------------------------------------------------------------------
+// Branding & Site Settings (singletons)
+// ---------------------------------------------------------------------------
+
+model BrandSettings {
+  id                 String   @id @default("singleton")
+  siteNameEn         String   @db.VarChar(200)
+  siteNameAr         String?  @db.VarChar(200)
+  taglineEn          String   @db.VarChar(200)
+  taglineAr          String?  @db.VarChar(200)
+  secondaryTaglineEn String?  @db.VarChar(300)
+  secondaryTaglineAr String?  @db.VarChar(300)
+  logoPrimaryId      String? @unique
+  logoPrimary        MediaAsset? @relation("BrandPrimaryLogo", fields: [logoPrimaryId], references: [id], onDelete: SetNull)
+  logoAltId          String? @unique
+  logoAlt            MediaAsset? @relation("BrandAltLogo", fields: [logoAltId], references: [id], onDelete: SetNull)
+  logoMarkId         String? @unique
+  logoMark           MediaAsset? @relation("BrandMarkLogo", fields: [logoMarkId], references: [id], onDelete: SetNull)
+  colorPrimary       String   @default("#1a202c")
+  colorSecondary     String   @default("#0e7490")
+  colorAccent        String   @default("#e8722a")
+  colorBg            String   @default("#faf8f4")
+  colorText          String   @default("#1a202c")
+  fontHeading        String   @default("Inter")
+  fontBody           String   @default("Inter")
+  updatedAt          DateTime @updatedAt
+
+  @@map("brand_settings")
+}
+
+model SiteContent {
+  id      String  @id @default(uuid())
+  key     String  @unique @db.VarChar(100)
+  titleEn String? @db.VarChar(300)
+  titleAr String? @db.VarChar(300)
+  bodyEn  String? @db.Text
+  bodyAr  String? @db.Text
+  mediaId String?
+  media   MediaAsset? @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  updatedAt DateTime @updatedAt
+
+  @@map("site_content")
+}
+
+model ContactDetails {
+  id          String  @id @default("singleton")
+  email       String? @db.VarChar(200)
+  phone       String? @db.VarChar(100)
+  website     String? @db.VarChar(200)
+  instagram   String? @db.VarChar(200)
+  tiktok      String? @db.VarChar(200)
+  addressesEn Json?
+  addressesAr Json?
+  updatedAt   DateTime @updatedAt
+
+  @@map("contact_details")
+}
+
+model ContactSubmission {
+  id        String                @id @default(uuid())
+  name      String                @db.VarChar(200)
+  email     String                @db.VarChar(200)
+  message   String                @db.Text
+  locale    String                @default("en") @db.VarChar(10)
+  status    ContactSubmissionStatus @default(NEW)
+  createdAt DateTime              @default(now())
+
+  @@index([status, createdAt])
+  @@map("contact_submissions")
+}
