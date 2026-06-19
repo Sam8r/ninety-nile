@@ -40,9 +40,6 @@ export default async function PreviewCaseStudyPage({
             {study.category.replace(/_/g, " ").toLowerCase()}
           </Badge>
           <h1 className="font-heading text-3xl font-bold">{study.titleEn}</h1>
-          {study.titleAr && (
-            <p dir="rtl" className="mt-1 text-xl text-muted-foreground">{study.titleAr}</p>
-          )}
           {study.clientEn && <p className="mt-2 text-accent">{study.clientEn}</p>}
         </header>
 
@@ -54,9 +51,9 @@ export default async function PreviewCaseStudyPage({
           />
         )}
 
-        <Section title="Challenge" en={study.challengeEn} ar={study.challengeAr} />
-        <Section title="Solution" en={study.solutionEn} ar={study.solutionAr} />
-        <Section title="Results" en={study.resultsEn} ar={study.resultsAr} />
+        <Section title="Challenge" en={study.challengeEn} />
+        <Section title="Solution" en={study.solutionEn} />
+        <Section title="Results" en={study.resultsEn} />
 
         {metrics.length > 0 && (
           <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -88,24 +85,15 @@ export default async function PreviewCaseStudyPage({
   );
 }
 
-function Section({ title, en, ar }: { title: string; en: string | null; ar: string | null }) {
-  if (!en && !ar) return null;
+function Section({ title, en }: { title: string; en: string | null }) {
+  if (!en) return null;
   return (
     <section className="space-y-2">
       <h2 className="font-heading text-xl font-bold">{title}</h2>
-      {en && (
-        <div
-          className="prose-richtext"
-          dangerouslySetInnerHTML={{ __html: sanitizeRichText(en) }}
-        />
-      )}
-      {ar && (
-        <div
-          className="prose-richtext mt-3 border-s-2 ps-4"
-          dir="rtl"
-          dangerouslySetInnerHTML={{ __html: sanitizeRichText(ar) }}
-        />
-      )}
+      <div
+        className="prose-richtext"
+        dangerouslySetInnerHTML={{ __html: sanitizeRichText(en) }}
+      />
     </section>
   );
 }

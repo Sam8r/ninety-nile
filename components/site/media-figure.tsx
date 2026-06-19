@@ -1,13 +1,9 @@
 import Image from "next/image";
-import type { Locale } from "@/lib/i18n/routing";
 
 type MediaFigureProps = {
   path?: string | null;
   altEn?: string | null;
-  altAr?: string | null;
-  locale: Locale;
   captionEn?: string | null;
-  captionAr?: string | null;
   priority?: boolean;
   sizes?: string;
   className?: string;
@@ -17,17 +13,14 @@ type MediaFigureProps = {
 export function MediaFigure({
   path,
   altEn,
-  altAr,
-  locale,
   captionEn,
-  captionAr,
   priority,
   sizes = "(max-width: 768px) 100vw, 50vw",
   className,
   rounded = true,
 }: MediaFigureProps) {
-  const alt = (locale === "ar" ? altAr ?? altEn : altEn) ?? "";
-  const caption = locale === "ar" ? captionAr ?? captionEn : captionEn;
+  const alt = (altEn ?? "").trim();
+  const caption = (captionEn ?? "").trim() || undefined;
 
   if (!path) {
     return (

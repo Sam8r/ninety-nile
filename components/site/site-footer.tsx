@@ -1,11 +1,10 @@
 import "server-only";
-import { Link } from "@/lib/i18n/navigation";
-import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 import { getBrandTokens } from "@/lib/branding";
+import { ui } from "@/lib/content/ui";
 import { prisma } from "@/lib/db";
 
 export async function SiteFooter() {
-  const t = await getTranslations({ namespaces: ["Footer", "Contact", "Nav"] });
   const brand = await getBrandTokens();
 
   const contact = await prisma.contactDetails.findUnique({
@@ -15,38 +14,38 @@ export async function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border/60 bg-secondary/30">
-      <div className="container-wide grid gap-8 py-12 md:grid-cols-3">
+    <footer className="border-t-2 border-black bg-black text-white">
+      <div className="container-wide grid gap-8 py-16 md:grid-cols-3">
         <div className="space-y-2">
-          <p className="font-heading text-xl font-bold">{brand.siteNameEn}</p>
-          <p className="text-sm text-muted-foreground">{brand.taglineEn}</p>
+          <p className="font-heading text-2xl font-bold">{brand.siteNameEn}</p>
+          <p className="text-sm text-white/70">{brand.taglineEn}</p>
         </div>
 
         <nav className="flex flex-col gap-2 text-sm">
-          <span className="font-medium">{t("Nav.work")}</span>
-          <Link href="/work" className="text-muted-foreground hover:text-foreground">
-            {t("Nav.work")}
+          <span className="font-heading font-semibold uppercase tracking-wide">Explore</span>
+          <Link href="/work" className="text-white/70 hover:text-white">
+            {ui.nav.work}
           </Link>
-          <Link href="/about" className="text-muted-foreground hover:text-foreground">
-            {t("Nav.about")}
+          <Link href="/about" className="text-white/70 hover:text-white">
+            {ui.nav.about}
           </Link>
-          <Link href="/services" className="text-muted-foreground hover:text-foreground">
-            {t("Nav.services")}
+          <Link href="/services" className="text-white/70 hover:text-white">
+            {ui.nav.services}
           </Link>
-          <Link href="/contact" className="text-muted-foreground hover:text-foreground">
-            {t("Nav.contact")}
+          <Link href="/contact" className="text-white/70 hover:text-white">
+            {ui.nav.contact}
           </Link>
         </nav>
 
         <div className="flex flex-col gap-2 text-sm">
-          <span className="font-medium">{t("Nav.contact")}</span>
+          <span className="font-heading font-semibold uppercase tracking-wide">Contact</span>
           {contact?.email && (
-            <a href={`mailto:${contact.email}`} className="text-muted-foreground hover:text-foreground">
+            <a href={`mailto:${contact.email}`} className="text-white/70 hover:text-white">
               {contact.email}
             </a>
           )}
           {contact?.phone && (
-            <a href={`tel:${contact.phone}`} className="text-muted-foreground hover:text-foreground">
+            <a href={`tel:${contact.phone}`} className="text-white/70 hover:text-white">
               {contact.phone}
             </a>
           )}
@@ -55,20 +54,20 @@ export async function SiteFooter() {
               href={contact.instagram}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-foreground"
+              className="text-white/70 hover:text-white"
             >
-              {t("Contact.instagram")}
+              {ui.contact.instagram}
             </a>
           )}
         </div>
       </div>
 
-      <div className="border-t border-border/60 py-6">
-        <div className="container-wide flex flex-col items-center justify-between gap-2 text-xs text-muted-foreground sm:flex-row">
+      <div className="border-t border-white/10 py-6">
+        <div className="container-wide flex flex-col items-center justify-between gap-2 text-xs text-white/50 sm:flex-row">
           <p>
-            © {year} {brand.siteNameEn}. {t("Footer.rights")}
+            &copy; {year} {brand.siteNameEn}. {ui.footer.rights}
           </p>
-          <p>{t("Footer.tagline")}</p>
+          <p>{ui.footer.tagline}</p>
         </div>
       </div>
     </footer>

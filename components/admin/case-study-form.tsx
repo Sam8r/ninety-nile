@@ -96,10 +96,10 @@ export function CaseStudyForm({ id, initial }: Props) {
     <form onSubmit={onSubmit} className="space-y-8">
       {/* Bilingual core */}
       <fieldset className="space-y-4 rounded-lg border p-4">
-        <legend className="px-1 font-heading text-sm font-semibold">Basics (EN / AR)</legend>
+        <legend className="px-1 font-heading text-sm font-semibold">Basics</legend>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <Label htmlFor="titleEn">Title (English) *</Label>
+            <Label htmlFor="titleEn">Title *</Label>
             <Input
               id="titleEn"
               required
@@ -113,19 +113,6 @@ export function CaseStudyForm({ id, initial }: Props) {
             {errors.titleEn && <p className="mt-1 text-xs text-destructive">{errors.titleEn}</p>}
           </div>
           <div>
-            <Label htmlFor="titleAr">Title (Arabic)</Label>
-            <Input
-              id="titleAr"
-              value={form.titleAr}
-              onChange={(e) => set("titleAr", e.target.value)}
-              dir="rtl"
-              className={inputCls}
-            />
-            {errors.titleAr && <p className="mt-1 text-xs text-destructive">{errors.titleAr}</p>}
-          </div>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
             <Label htmlFor="slug">Slug *</Label>
             <Input
               id="slug"
@@ -136,6 +123,8 @@ export function CaseStudyForm({ id, initial }: Props) {
             />
             {errors.slug && <p className="mt-1 text-xs text-destructive">{errors.slug}</p>}
           </div>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
           <div>
             <Label htmlFor="category">Category</Label>
             <select
@@ -151,26 +140,14 @@ export function CaseStudyForm({ id, initial }: Props) {
               ))}
             </select>
           </div>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <Label htmlFor="clientEn">Client (English)</Label>
+            <Label htmlFor="clientEn">Client</Label>
             <Input id="clientEn" value={form.clientEn} onChange={(e) => set("clientEn", e.target.value)} className={inputCls} />
           </div>
-          <div>
-            <Label htmlFor="clientAr">Client (Arabic)</Label>
-            <Input id="clientAr" value={form.clientAr} onChange={(e) => set("clientAr", e.target.value)} dir="rtl" className={inputCls} />
-          </div>
         </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <Label htmlFor="summaryEn">Summary (English)</Label>
-            <Textarea id="summaryEn" value={form.summaryEn} onChange={(e) => set("summaryEn", e.target.value)} className={inputCls} />
-          </div>
-          <div>
-            <Label htmlFor="summaryAr">Summary (Arabic)</Label>
-            <Textarea id="summaryAr" value={form.summaryAr} onChange={(e) => set("summaryAr", e.target.value)} dir="rtl" className={inputCls} />
-          </div>
+        <div>
+          <Label htmlFor="summaryEn">Summary</Label>
+          <Textarea id="summaryEn" value={form.summaryEn} onChange={(e) => set("summaryEn", e.target.value)} className={inputCls} />
         </div>
       </fieldset>
 
@@ -178,28 +155,15 @@ export function CaseStudyForm({ id, initial }: Props) {
       {(["challenge", "solution", "results"] as const).map((section) => (
         <fieldset key={section} className="space-y-4 rounded-lg border p-4">
           <legend className="px-1 font-heading text-sm font-semibold capitalize">{section}</legend>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <Label htmlFor={`${section}En`}>{section} (English)</Label>
-              <Textarea
-                id={`${section}En`}
-                rows={6}
-                value={form[`${section}En`]}
-                onChange={(e) => set(`${section}En`, e.target.value)}
-                className={inputCls}
-              />
-            </div>
-            <div>
-              <Label htmlFor={`${section}Ar`}>{section} (Arabic)</Label>
-              <Textarea
-                id={`${section}Ar`}
-                rows={6}
-                dir="rtl"
-                value={form[`${section}Ar`]}
-                onChange={(e) => set(`${section}Ar`, e.target.value)}
-                className={inputCls}
-              />
-            </div>
+          <div>
+            <Label htmlFor={`${section}En`} className="capitalize">{section}</Label>
+            <Textarea
+              id={`${section}En`}
+              rows={6}
+              value={form[`${section}En`]}
+              onChange={(e) => set(`${section}En`, e.target.value)}
+              className={inputCls}
+            />
           </div>
         </fieldset>
       ))}
@@ -221,24 +185,12 @@ export function CaseStudyForm({ id, initial }: Props) {
         {form.metrics.map((metric, i) => (
           <div key={i} className="flex flex-wrap items-end gap-2">
             <div>
-              <Label>Label (EN)</Label>
+              <Label>Label</Label>
               <Input
                 value={metric.labelEn}
                 onChange={(e) => {
                   const next = [...form.metrics];
                   next[i] = { ...next[i]!, labelEn: e.target.value };
-                  set("metrics", next);
-                }}
-              />
-            </div>
-            <div>
-              <Label>Label (AR)</Label>
-              <Input
-                dir="rtl"
-                value={metric.labelAr}
-                onChange={(e) => {
-                  const next = [...form.metrics];
-                  next[i] = { ...next[i]!, labelAr: e.target.value };
                   set("metrics", next);
                 }}
               />

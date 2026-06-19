@@ -28,31 +28,30 @@ export const externalLinksSchema = z.array(externalLinkSchema).default([]);
 export const orderSchema = z.number().int().min(0).default(0);
 
 /**
- * Enforce bilingual content parity on publish: every paired EN/AR required
- * field must be non-empty when status === "PUBLISHED" (Constitution Principle I).
+ * Enforce English content completeness on publish: every required English
+ * field must be non-empty when status === "PUBLISHED" (English-only redesign).
  *
- * `pairs` is a list of [enKey, arKey] tuples pointing at string fields on the
- * parsed value. Returns a list of human-readable error paths.
+ * `fields` is a list of field keys pointing at string fields on the parsed
+ * value. Returns a list of human-readable error paths.
  */
-export function bilingualPublishErrors<T extends Record<string, unknown>>(
+export function publishErrors<T extends Record<string, unknown>>(
   parsed: T,
-  pairs: ReadonlyArray<readonly [string, string]>,
+  fields: readonly string[],
 ): string[] {
   const errors: string[] = [];
   const isPublishing = parsed.status === "PUBLISHED";
   if (!isPublishing) return errors;
-  for (const [enKey, arKey] of pairs) {
-    const en = typeof parsed[enKey] === "string" ? (parsed[enKey] as string).trim() : "";
-    const ar = typeof parsed[arKey] === "string" ? (parsed[arKey] as string).trim() : "";
-    if (!en) errors.push(`${enKey} (required for publish)`);
-    if (!ar) errors.push(`${arKey} (required for publish)`);
+  for (const key of fields) {
+    const val = typeof parsed[key] === "string" ? (parsed[key] as string).trim() : "";
+    if (!val) errors.push(`${key} (required for publish)`);
   }
   return errors;
 }
 
+/** @deprecated Use publishErrors() — English-only redesign. */
+export const bilingualPublishErrors = publishErrors;
+
 export const sanitizeRichText = (raw: string): string => {
-  // Basic server-side guard: strip <script>, on* attributes, javascript: URIs.
-  // The editor also sanitizes on render; this is a defense-in-depth pass.
   if (!raw) return "";
   return raw
     .replace(/<script[\s\S]*?<\/script>/gi, "")

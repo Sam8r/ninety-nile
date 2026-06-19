@@ -1,5 +1,5 @@
 import { listClients, upsertClient, deleteClient } from "@/lib/actions/structured-content";
-import { BilingualCrudManager } from "@/components/admin/bilingual-crud-manager";
+import { CrudManager } from "@/components/admin/crud-manager";
 
 export const metadata = { title: "Clients" };
 
@@ -12,7 +12,7 @@ export default async function ClientsAdminPage() {
         <h1 className="font-heading text-2xl font-bold">Clients</h1>
         <p className="text-sm text-muted-foreground">Clients shown on the Clients page.</p>
       </div>
-      <BilingualCrudManager
+      <CrudManager
         items={items.map((s) => ({ id: s.id, name: s.name, url: s.url ?? "", order: s.order }))}
         fields={[
           { key: "name", label: "Name", required: true },

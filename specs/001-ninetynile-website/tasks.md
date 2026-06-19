@@ -1,262 +1,208 @@
 ---
-description: "Task list for NinetyNile bilingual website + admin dashboard"
+description: "Task list for NinetyNile redesign — English-only · Bauhaus · Three.js river hero"
 ---
 
-# Tasks: NinetyNile Bilingual Agency Website + Admin Dashboard
+# Tasks: NinetyNile Website Redesign (English-only · Bauhaus · Three.js River Hero)
 
 **Input**: Design documents from `/specs/001-ninetynile-website/`
-**Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/
+**Prerequisites**: plan.md (redesign), research.md (Redesign Addendum v2), data-model.md (Redesign Delta v2), contracts/ (hero-river.md, asset-pipeline.md)
 
-**Tests**: Critical-path tests are INCLUDED because Constitution v1.0.0 Principle V mandates
-end-to-end coverage of the visitor journey, RTL switching, auth/role boundaries, and the
-publish workflow. Coverage is focused on these surfaces, not exhaustive.
+**Tests**: Critical-path tests are included per Constitution v2.0.0 Principle V (visitor journey, auth/role, publish workflow, hero graceful-degradation). Exhaustive per-screen tests are NOT required.
 
-**Organization**: Tasks are grouped by user story (US1–US4) to enable independent implementation
-and testing. Paths follow the single full-stack Next.js layout in plan.md.
+**Organization**: This is a **redesign delta** on the existing implementation — most tasks MODIFY existing files. Tasks are grouped by user story for independent delivery.
 
 ## Format: `[ID] [P?] [Story] Description`
 
-- **[P]**: Can run in parallel (different files, no dependencies on incomplete tasks)
-- **[Story]**: US1–US4 (user story phases only)
+- **[P]**: Can run in parallel (different files, no dependency on incomplete tasks)
+- **[Story]**: US1 (public redesign), US2 (editor admin), US3 (admin branding/content), US4 (users)
 
 ## Path Conventions
 
-Single Next.js App Router project at repo root: `app/`, `components/`, `lib/`, `prisma/`,
-`messages/`, `tests/`, with public site under `app/[locale]/(site)` and dashboard under `app/admin`.
+Single Next.js app at repo root: `app/`, `components/`, `lib/`, `prisma/`, `public/`, `tests/`.
 
 ---
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-**Purpose**: Project initialization and tooling.
+**Purpose**: Dependencies, fonts, and the PDF asset pipeline that everything else draws on.
 
-- [X] T001 Initialize Next.js 15 app (App Router, React 19, TypeScript strict, `output: "standalone"`) at repo root with `app/`, `components/`, `lib/` structure per plan.md
-- [X] T002 [P] Install and configure Tailwind CSS + shadcn/ui (logical properties enabled) in `tailwind.config.ts` and `app/globals.css`
-- [X] T003 [P] Configure ESLint, Prettier, and TypeScript strict settings in `.eslintrc`, `.prettierrc`, `tsconfig.json`
-- [X] T004 [P] Install core deps (Prisma, @prisma/client, next-auth@beta, next-intl, zod, react-hook-form, bcrypt, sharp) and dev deps (vitest, @playwright/test) in `package.json`
-- [X] T005 [P] Initialize Prisma (`prisma init`) and create `prisma/schema.prisma` datasource/generator blocks
-- [X] T006 [P] Configure next-intl: `lib/i18n/routing.ts` (locales `en`,`ar`; default `en`), `messages/en.json`, `messages/ar.json`, `lib/i18n/request.ts`
-- [X] T007 [P] Create `docker-compose.yml` (web + `postgres:16` + named volumes `pgdata`,`uploads`) and `Dockerfile` (standalone build)
-- [X] T008 [P] Create `.env.example` and `lib/env.ts` (Zod-validated env: DATABASE_URL, AUTH_SECRET, ADMIN_EMAIL/PASSWORD, UPLOAD_DIR, SMTP_*)
+- [X] T001 Add WebGL deps to `package.json`: `three`, `@react-three/fiber`, `@react-three/drei` (deps) and `@types/three` (devDep); run install and commit `pnpm-lock.yaml`.
+- [X] T002 [P] Load Bauhaus typography via `next/font` (geometric display + neutral body, e.g. Space Grotesk + Inter) in `app/layout.tsx`, exposing `--font-heading`/`--font-body` CSS vars.
+- [X] T003 [P] Curate the extracted PDF images: select hero/case-study/team/client/graphic assets from `public/media/from-pdf/`, optimize to AVIF/WebP via `sharp`, and place the keepers in `public/media/curated/` (committed); leave the raw dump gitignored per `asset-pipeline.md`.
+- [X] T004 [P] Catalog brand logos in `public/brand/` (`NN_Logos-*`, `Picture7-1.png`): pick header/footer/favicon variants and record paths in `specs/001-ninetynile-website/contracts/asset-pipeline.md` notes.
 
-**Checkpoint**: Project builds and runs an empty page in both `/en` and `/ar`.
+**Checkpoint**: Deps installed, fonts wired, curated imagery + logos ready to reference.
 
 ---
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
-**Purpose**: Core infrastructure all user stories depend on.
+**Purpose**: De-internationalize to English-only and stand up the Bauhaus token system. **Blocks all user stories** — every page and form depends on the flattened routing, the English dictionary, and the design tokens.
 
-**⚠️ CRITICAL**: No user story work begins until this phase is complete.
+⚠️ Complete this entire phase before starting any user story.
 
-- [X] T009 Define full Prisma schema (User, CaseStudy, Project, MediaAsset, CaseStudyMedia, Service, ProcessStep, ProductionPhase, EquipmentItem, TeamMember, Client, Testimonial, BrandSettings, SiteContent, ContactDetails, ContactSubmission; enums Role/Status/Category) per data-model.md in `prisma/schema.prisma`
-- [X] T010 Create initial migration and Prisma client singleton in `lib/db.ts` (`prisma migrate dev`)
-- [X] T011 [P] Implement locale layout with `dir` rtl/ltr + next-intl provider in `app/[locale]/layout.tsx`
-- [X] T012 [P] Implement brand theming: read BrandSettings → emit CSS variables (colors/fonts) in root layout `app/[locale]/layout.tsx` + `lib/branding.ts`
-- [X] T013 [P] Implement media storage abstraction (`sharp` resize, local-volume write/read, metadata) in `lib/media.ts`
-- [X] T014 [P] Scaffold shared Zod validation module + bilingual-required-on-publish helper in `lib/validation/`
-- [X] T015 Configure Auth.js v5 credentials provider (bcrypt verify, role in session) in `lib/auth.ts` and `app/api/auth/[...nextauth]/route.ts`
-- [X] T016 Implement `middleware.ts` guarding `/admin/*` (redirect to login) + `requireSession()`/`requireRole()` helpers in `lib/auth-guards.ts`
-- [X] T017 Build admin shell: login page `app/admin/login/page.tsx` and dashboard layout with role-based nav in `app/admin/(dashboard)/layout.tsx`
-- [X] T018 Implement seed script seeding the admin user + all PDF content (brand, services, process, production, tribe, 9 case studies, community story, clients, testimonials, contact) from data-model.md in `prisma/seed.ts`
-- [X] T019 [P] Add shared UI primitives (shadcn components) and base `components/site/` + `components/admin/` scaffolding
+### English-only routing & strings
 
-**Checkpoint**: Migrated DB seeded with PDF content; admin can log in; locale + RTL + branding render.
+- [X] T005 Remove the `next-intl` middleware from `middleware.ts`; keep only the `/admin` auth guard and the static-file/`/api`/`/uploads` passthrough; simplify the `config.matcher`.
+- [X] T006 Flatten routing: move every route from `app/[locale]/(site)/*` to `app/(site)/*` (pages: home, about, services, process, production, work, work/[slug], tribe, clients, community, experiences, contact, not-found), and delete the `app/[locale]/` tree.
+- [X] T007 Update the root `app/layout.tsx` to render `<html lang="en" dir="ltr">` with no locale param and no `NextIntlClientProvider`; remove `app/[locale]/layout.tsx`.
+- [X] T008 [P] Create `lib/content/ui.ts` — a typed English UI-string dictionary replacing `messages/en.json` (Nav, Home, common labels); delete `messages/en.json` and `messages/ar.json` and the `messages/` dir.
+- [X] T009 Remove `lib/i18n/*` (`routing.ts`, `navigation.ts`, `request.ts`, `content.ts`) and `next-intl` config in `next.config.mjs`; replace `@/lib/i18n/navigation` `Link` imports with `next/link` and `getTranslations` calls with `lib/content/ui.ts` lookups across `app/` and `components/`.
+- [X] T010 Remove `next-intl` from `package.json` dependencies once no imports remain; run typecheck to confirm.
 
----
+### Bauhaus design tokens & validation
 
-## Phase 3: User Story 1 - Visitor explores the agency and its work (Priority: P1) 🎯 MVP
+- [X] T011 Rewrite `app/globals.css` tokens for Bauhaus: white background, black foreground, primary accents (red/blue/yellow) mapped to `--brand-*` vars; add an oversized geometric type scale and a generous spacing scale; remove the `[dir="rtl"]` block.
+- [X] T012 [P] Extend `tailwind.config.ts`: map Bauhaus accent colors, set `fontFamily.heading/body` to the new font vars, widen the display font-size scale, and add a `flow`/`ripple` keyframe for the river fallback shimmer.
+- [X] T013 [P] Update `lib/branding.ts`: Bauhaus token defaults (palette + typography) and English-only getters (drop `*Ar` tagline/name getters from the public path).
+- [X] T014 Update `lib/validation/*.ts` (`case-study.ts`, `project.ts`, `settings.ts`, `user.ts`, `index.ts`): publish gate requires English fields only; make `*Ar` optional/nullable in all schemas.
+- [X] T015 [P] Confirm `prisma/schema.prisma` `*Ar` columns are nullable (deprecated, not dropped); add a `// deprecated: English-only redesign` comment. No destructive migration in this phase.
 
-**Goal**: A fully navigable bilingual public website presenting the entire profile and all case studies.
-
-**Independent Test**: Navigate Home → Services → Our Work → a case study → Contact, in EN and AR (RTL), on mobile and desktop, reading seeded content.
-
-### Tests for User Story 1
-
-- [~] T020 [P] [US1] Playwright e2e: visitor journey home→work→detail→contact in EN and AR (RTL) in `tests/e2e/visitor-journey.spec.ts`
-
-### Implementation for User Story 1
-
-- [X] T021 [P] [US1] Build Header/nav, Footer, and LanguageSwitcher (locale-aware, persists choice) in `components/site/`
-- [X] T022 [P] [US1] Build CaseStudyCard, MediaFigure, and ExternalVideoEmbed components in `components/site/`
-- [X] T023 [US1] Home page (brand hero, tagline, intro, featured case studies, services preview) in `app/[locale]/(site)/page.tsx`
-- [X] T024 [P] [US1] About page (story, Cause & Effect, Why Content) in `app/[locale]/(site)/about/page.tsx`
-- [X] T025 [P] [US1] Services page in `app/[locale]/(site)/services/page.tsx`
-- [X] T026 [P] [US1] Creative Process page in `app/[locale]/(site)/process/page.tsx`
-- [X] T027 [P] [US1] Production page (3 phases + equipment) in `app/[locale]/(site)/production/page.tsx`
-- [X] T028 [P] [US1] Brand Experiences & Events page in `app/[locale]/(site)/experiences/page.tsx`
-- [X] T029 [P] [US1] Our Tribe page in `app/[locale]/(site)/tribe/page.tsx`
-- [X] T030 [US1] Our Work listing (published, ordered) in `app/[locale]/(site)/work/page.tsx`
-- [X] T031 [US1] Case study detail (Challenge/Solution/Results, metrics, gallery, external links) + `generateMetadata` in `app/[locale]/(site)/work/[slug]/page.tsx`
-- [X] T032 [P] [US1] Community Achievement page (before/process/after media) in `app/[locale]/(site)/community/page.tsx`
-- [X] T033 [P] [US1] Clients + Testimonials page in `app/[locale]/(site)/clients/page.tsx`
-- [X] T034 [US1] Contact page + form component, and `POST /api/contact` (store submission, honeypot, rate limit) in `app/[locale]/(site)/contact/page.tsx` and `app/api/contact/route.ts`
-- [X] T035 [P] [US1] Per-page SEO/OG metadata, `sitemap.ts`, `robots.ts`
-- [X] T036 [US1] Wire ISR/revalidate tags (`work`, `case-study:<slug>`, `branding`, `contact`) for public reads
-
-**Checkpoint**: Public site is complete and demoable as the MVP using seeded content.
+**Checkpoint**: App builds and runs English-only at `/` (no locale prefix); Bauhaus tokens active; publish validation English-only. User stories can now begin.
 
 ---
 
-## Phase 4: User Story 2 - Editor manages case studies and projects (Priority: P2)
+## Phase 3: User Story 1 — Visitor explores the redesigned site (Priority: P1) 🎯 MVP
 
-**Goal**: Authenticated editors do full bilingual CRUD + reorder + publish for case studies and projects with media.
+**Goal**: An English-only, Bauhaus-styled public site with big headlines/white space/big imagery, a signature interactive Three.js river hero, and real PDF-sourced imagery across all pages.
 
-**Independent Test**: Log in as editor, create a bilingual case study with an uploaded image, publish it (appears on site), unpublish it (disappears).
+**Independent Test**: Navigate Home → Services → Our Work → a case-study detail → Contact in English; confirm Bauhaus styling, the river hero reacting to mouse/touch in the lower third, and the static fallback under reduced-motion/no-WebGL.
 
-### Tests for User Story 2
+### River hero (contracts/hero-river.md)
 
-- [~] T037 [P] [US2] Playwright e2e: editor create→publish→appears→reorder→unpublish in `tests/e2e/casestudy-crud.spec.ts`
+- [X] T016 [P] [US1] Create `components/site/river-hero/water-material.ts` — a custom flowing-water shader (scrolling flow-noise + pointer-ripple uniform).
+- [X] T017 [P] [US1] Create `components/site/river-hero/river-fallback.tsx` — static river image (from curated PDF asset) for reduced-motion / no-WebGL.
+- [X] T018 [US1] Create `components/site/river-hero/river-hero.tsx` (`'use client'`) — R3F `<Canvas>` confined to the lower third, pointer + touch ripple, `IntersectionObserver`/`visibilitychange` pause, DPR cap, `aria-hidden`, dispose-on-unmount; renders fallback on reduced-motion/no-WebGL per `RiverHeroProps`.
+- [X] T019 [US1] Integrate the hero into `app/(site)/page.tsx`: Bauhaus hero (oversized headline + CTA above) with `<RiverHero>` dynamically imported via `next/dynamic({ ssr: false })`, fixed-height band → zero CLS.
 
-### Implementation for User Story 2
+### Shared site chrome & components (Bauhaus, English-only)
 
-- [X] T038 [P] [US2] Zod `CaseStudyInput` + `ProjectInput` schemas (publish requires EN+AR) in `lib/validation/case-study.ts` and `lib/validation/project.ts`
-- [X] T039 [P] [US2] MediaPicker/upload UI in `components/admin/` and `POST /api/media` route handler in `app/api/media/route.ts`
-- [X] T040 [US2] Case study server actions (list/get/create/update/delete/reorder, revalidation) in `lib/actions/case-studies.ts` per contracts/admin-casestudies.md
-- [X] T041 [US2] Case studies list + drag-reorder page in `app/admin/(dashboard)/case-studies/page.tsx`
-- [X] T042 [US2] Case study create/edit form (bilingual fields, metrics, hero+gallery media, external links, publish validation) in `app/admin/(dashboard)/case-studies/[id]/page.tsx`
-- [X] T043 [P] [US2] Project server actions + admin list/form pages (mirror case studies) in `lib/actions/projects.ts` and `app/admin/(dashboard)/projects/`
-- [X] T044 [US2] Draft preview path so editors view an item before publishing in `app/admin/(dashboard)/case-studies/[id]/preview/page.tsx`
+- [X] T020 [US1] Re-skin `components/site/site-header.tsx`: remove `LanguageSwitcher`, English nav from `lib/content/ui.ts`, Bauhaus layout + logo from `public/brand/`.
+- [X] T021 [P] [US1] Delete `components/site/language-switcher.tsx` and remove all references.
+- [X] T022 [P] [US1] Re-skin `components/site/site-footer.tsx` and `components/site/site-nav.tsx` — English-only, Bauhaus.
+- [X] T023 [P] [US1] Update `components/site/case-study-card.tsx` — single English fields, Bauhaus card (big image, bold title).
+- [X] T024 [P] [US1] Restyle `components/site/page-header.tsx`, `media-figure.tsx`, `external-video-embed.tsx` to the Bauhaus system.
+- [X] T025 [P] [US1] Update `components/site/contact-form.tsx` — English-only labels/validation, Bauhaus styling, retain honeypot/rate-limit.
 
-**Checkpoint**: Editors manage portfolio content end-to-end; changes reflect on the public site.
+### Public pages (Bauhaus + PDF imagery, English-only)
+
+- [X] T026 [US1] Redesign `app/(site)/page.tsx` sections below the hero (featured work, services preview) — big imagery, white space, English copy.
+- [X] T027 [P] [US1] Redesign `app/(site)/about/page.tsx` (origin/operations/"Cause & Effect") with curated imagery.
+- [X] T028 [P] [US1] Redesign `app/(site)/services/page.tsx` and `app/(site)/process/page.tsx`.
+- [X] T029 [P] [US1] Redesign `app/(site)/production/page.tsx` and `app/(site)/experiences/page.tsx`.
+- [X] T030 [P] [US1] Redesign `app/(site)/work/page.tsx` (listing grid + empty state) and `app/(site)/work/[slug]/page.tsx` (Challenge/Solution/Results, metrics, gallery, external links).
+- [X] T031 [P] [US1] Redesign `app/(site)/tribe/page.tsx`, `app/(site)/clients/page.tsx`, `app/(site)/community/page.tsx`.
+- [X] T032 [P] [US1] Redesign `app/(site)/contact/page.tsx` with English contact details + form.
+
+### SEO, seed & data wiring
+
+- [X] T033 [P] [US1] Update `lib/page-metadata.ts`, `app/sitemap.ts`, `app/robots.ts`, and `app/(site)/not-found.tsx` to English-only (no locale alternates).
+- [X] T034 [US1] Update `prisma/seed.ts`: English-only content from the PDF, Bauhaus `BrandSettings` tokens, and curated media wired into hero, case studies, services, team, and clients.
+
+### Critical-path tests (US1)
+
+- [X] T035 [P] [US1] Playwright: visitor journey Home → Services → Work → case-study detail → Contact (no locale prefix) in `tests/e2e/visitor-journey.spec.ts`.
+- [X] T036 [P] [US1] Playwright: hero graceful degradation — `prefers-reduced-motion` and WebGL-disabled both render the static river and a usable page in `tests/e2e/hero-fallback.spec.ts`.
+- [X] T037 [P] [US1] Remove/replace the old RTL/locale-switch e2e test; delete assertions on `/en` `/ar` routing.
+
+**Checkpoint**: US1 is independently shippable — the full redesigned English-only public site with the interactive hero. **This is the MVP.**
 
 ---
 
-## Phase 5: User Story 3 - Admin controls branding and site settings (Priority: P2)
+## Phase 4: User Story 2 — Editor manages case studies & projects (Priority: P2)
 
-**Goal**: Admins manage branding, section copy, structured content (services/process/tribe/clients/testimonials), media library, and contact details.
+**Goal**: Editors create/edit/reorder case studies and projects through English-only admin forms.
 
-**Independent Test**: Log in as admin, change tagline + a brand color + logo, confirm the public site updates.
+**Independent Test**: Log in as editor, create a case study with English content + uploaded image, publish it, confirm it appears on `/work`; unpublish and confirm it disappears.
 
-### Tests for User Story 3
+- [X] T038 [US2] Update `components/admin/case-study-form.tsx` — remove Arabic input fields; English-only validation via shared Zod; keep media/links/order/publish.
+- [X] T039 [P] [US2] Update `components/admin/project-form.tsx` — remove Arabic fields, English-only.
+- [X] T040 [P] [US2] Update `components/admin/bilingual-crud-manager.tsx` → single-language manager (drop the AR column/tab) used by list/reorder screens.
+- [X] T041 [P] [US2] Update `components/admin/media-picker.tsx` and `media-library-grid.tsx` — English alt text only.
+- [X] T042 [US2] Update `app/admin/(dashboard)/case-studies/[id]/preview/page.tsx`, `case-studies/page.tsx`, and `projects/page.tsx` to the English-only render path.
+- [X] T043 [P] [US2] Update `lib/actions/case-studies.ts` and `lib/actions/projects.ts` — English-only validation + `revalidatePath` on publish; ensure no `*Ar`-required logic remains.
+- [X] T044 [P] [US2] Playwright: editor create → publish → unpublish case study round-trip in `tests/e2e/editor-casestudy.spec.ts`.
 
-- [~] T045 [P] [US3] Playwright e2e: admin edits tagline/color/logo → reflected on public site in `tests/e2e/branding.spec.ts`
-
-### Implementation for User Story 3
-
-- [X] T046 [P] [US3] Zod schemas for BrandSettings, ContactDetails, SiteContent, Service, ProcessStep, ProductionPhase/EquipmentItem, TeamMember, Client, Testimonial in `lib/validation/`
-- [X] T047 [US3] Branding server actions + ADMIN-only branding page (logos, colors, fonts, taglines) in `lib/actions/branding.ts` and `app/admin/(dashboard)/branding/page.tsx` per contracts/admin-branding-settings.md
-- [X] T048 [P] [US3] Site content (About/Production/Community/Why-Content copy) server actions + admin page in `lib/actions/site-content.ts` and `app/admin/(dashboard)/content/page.tsx`
-- [X] T049 [P] [US3] CRUD managers for Services, Process steps, Tribe, Clients, Testimonials in `app/admin/(dashboard)/{services,process,tribe,clients,testimonials}/`
-- [X] T050 [US3] Contact details editor + submissions inbox in `app/admin/(dashboard)/contact/page.tsx`
-- [X] T051 [US3] Media library page (list, upload, delete with in-use guard) in `app/admin/(dashboard)/media/page.tsx` and `DELETE /api/media/[id]`
-- [X] T052 [US3] Revalidate `branding`/`contact`/section tags on save across the above actions
-
-**Checkpoint**: Agency can re-skin and re-content the entire public site without code changes.
+**Checkpoint**: Editors manage content end-to-end in English; public site reflects publish/unpublish.
 
 ---
 
-## Phase 6: User Story 4 - Admin manages users and access (Priority: P3)
+## Phase 5: User Story 3 — Admin controls Bauhaus branding & site content (Priority: P2)
 
-**Goal**: Admins manage user accounts and roles; editors are blocked from admin-only areas.
+**Goal**: Admin tunes the Bauhaus look (colors/typography tokens, logos, taglines) and section content without code.
 
-**Independent Test**: As admin, create an editor; log in as that editor and confirm branding/users routes are denied while case-study routes work.
+**Independent Test**: As admin, change a Bauhaus accent color and the primary tagline, upload a logo, and confirm the public header/footer/hero update.
 
-### Tests for User Story 4
+- [X] T045 [US3] Extend `components/admin/branding-form.tsx` — Bauhaus color tokens (primary + red/blue/yellow accents) and typography token pickers; English-only taglines/site name; writes to `BrandSettings`.
+- [X] T046 [P] [US3] Update `lib/actions/branding.ts` — persist Bauhaus tokens, validate via `lib/validation/settings.ts`, revalidate public layout.
+- [X] T047 [P] [US3] Update `components/admin/site-content-editor.tsx` and `contact-details-form.tsx` — English-only.
+- [X] T048 [P] [US3] Update the Services / Process / Tribe / Clients / Testimonials managers (`app/admin/(dashboard)/{services,process,tribe,clients,testimonials,content,contact}/page.tsx`) and `lib/actions/{site-content,structured-content}.ts` to English-only.
+- [X] T049 [P] [US3] Playwright: admin branding change reflects on public site in `tests/e2e/admin-branding.spec.ts`.
 
-- [~] T053 [P] [US4] Playwright e2e: editor blocked from `/admin/branding` & `/admin/users`; unauthenticated redirected to login in `tests/e2e/auth-roles.spec.ts`
+**Checkpoint**: Branding and section content are admin-editable; Bauhaus theme is data-driven (Constitution VI).
 
-### Implementation for User Story 4
+---
 
-- [X] T054 [P] [US4] Zod user schemas + user server actions (list/create/updateRole/delete, last-admin guard) in `lib/validation/user.ts` and `lib/actions/users.ts`
-- [X] T055 [US4] Users management page (ADMIN only) in `app/admin/(dashboard)/users/page.tsx`
-- [X] T056 [US4] Enforce `requireRole('ADMIN')` on all admin-only actions/routes and hide admin-only nav for editors in `app/admin/(dashboard)/layout.tsx`
+## Phase 6: User Story 4 — Admin manages users & access (Priority: P3)
 
-**Checkpoint**: Multi-user operation with enforced least-privilege access.
+**Goal**: Admin creates editor accounts and manages roles; editors are blocked from branding/user routes. (Largely existing — verify under the redesign.)
+
+**Independent Test**: As admin create an editor; log in as editor and confirm branding/user routes are denied while case-study routes are allowed.
+
+- [X] T050 [P] [US4] Verify/adjust `components/admin/users-manager.tsx` and `lib/actions/users.ts` render English-only; no behavioral regressions from de-i18n.
+- [X] T051 [P] [US4] Confirm server-side role guards in `lib/auth-guards.ts` and the `/admin` middleware still enforce `editor` exclusion from `branding`/`users` (Constitution III) after routing changes.
+- [X] T052 [P] [US4] Playwright: auth + role boundary test (unauth → login redirect; editor blocked from `/admin/branding` & `/admin/users`) in `tests/e2e/auth-roles.spec.ts`.
+
+**Checkpoint**: Role enforcement intact; user management works English-only.
 
 ---
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
-**Purpose**: Constitution gates and launch readiness.
+**Purpose**: Quality gates, cleanup, and doc alignment per Constitution v2.0.0.
 
-- [X] T057 [P] Vitest unit tests for Zod schemas (publish gate) and media/i18n/branding helpers in `tests/unit/`
-- [~] T058 [P] Accessibility pass (WCAG AA: alt text, keyboard, contrast, semantics) and Lighthouse ≥ 90 verification on home + a case study (Principle II / SC-005)
-- [X] T059 [P] Copy default logos to `public/brand/` and seed final/placeholder Arabic translations (Principle I)
-- [X] T060 Security hardening: login rate limit, security headers, rich-text sanitization on render (Principle III)
-- [X] T061 [P] Update `README.md` and run `quickstart.md` smoke checklist
-- [X] T062 Production Docker build verification: `migrate deploy` + `db seed` against compose stack
+- [X] T053 [P] Unit tests (Vitest) for updated Zod schemas (English-required publish gate) in `tests/unit/validation.test.ts`.
+- [X] T054 Verify Lighthouse Performance & Accessibility ≥ 90 on home (with canvas active) and a case study; record results; fix regressions (image sizing, three.js bundle isolation).
+- [X] T055 [P] Confirm three.js is excluded from the initial home-route JS bundle (dynamic import) and the WebGL bundle is within the budget in `contracts/hero-river.md`.
+- [X] T056 [P] Run `pnpm typecheck` and `pnpm lint`; resolve all errors from the de-i18n refactor.
+- [X] T057 [P] Update `spec.md` to the English-only redesign: revise FR-013 (drop bilingual/RTL), the bilingual acceptance scenarios in US1, and SC-007; note Bauhaus + river hero requirements. (Resolves the Sync Impact Report follow-up.)
+- [X] T058 [P] Update `README.md` cross-checks (English-only run, no locale URLs); confirm `quickstart.md` steps.
+- [X] T059 [P] Accessibility pass: alt text on all curated imagery, keyboard nav, contrast against the Bauhaus palette (Constitution II).
 
 ---
 
 ## Dependencies & Execution Order
 
-### Phase Dependencies
+- **Phase 1 (Setup)** → **Phase 2 (Foundational)**: strictly sequential; Phase 2 blocks all stories.
+- **User stories** after Phase 2:
+  - **US1 (P1)** is the MVP and should be delivered first.
+  - **US2 (P2)** and **US3 (P2)** are independent of each other and of US1's pages (they touch `app/admin/*` and `components/admin/*`); they can proceed in parallel once Phase 2 is done, depending on T014 (English-only validation) and T013 (branding tokens).
+  - **US4 (P3)** is mostly verification; depends only on the routing/guard changes in Phase 2.
+- **Phase 7 (Polish)** runs after the stories it audits; T057/T058 (docs) can start any time.
 
-- **Setup (Phase 1)**: No dependencies — start immediately.
-- **Foundational (Phase 2)**: Depends on Setup — BLOCKS all user stories.
-- **User Stories (Phase 3–6)**: All depend on Foundational.
-  - US1 (P1) is independent and is the MVP.
-  - US2 (P2) is independent of US1 (uses the same foundation/auth shell).
-  - US3 (P2) depends on the admin shell + media upload introduced in US2 (media library/picker reuse); sequence US2 → US3.
-  - US4 (P3) depends on the admin shell (Foundational) and finalizes role gating; sequence after US2.
-- **Polish (Phase 7)**: Depends on the targeted user stories being complete.
-
-### User Story Dependencies
-
-- **US1 (P1)**: Foundational only. No dependency on other stories.
-- **US2 (P2)**: Foundational only. Introduces media upload (`/api/media`, MediaPicker).
-- **US3 (P2)**: Foundational + reuses US2's media upload/picker. Branding read path already wired in Foundational (T012).
-- **US4 (P3)**: Foundational. Hardens role gating established in the admin shell.
-
-### Within Each User Story
-
-- Tests written first and expected to fail before implementation (Principle V).
-- Schemas/models before server actions; server actions before admin pages; components before pages that use them.
-- Story complete and independently testable before moving to the next priority.
-
-### Parallel Opportunities
-
-- All `[P]` Setup tasks (T002–T008) run in parallel after T001.
-- Foundational `[P]` tasks (T011–T014, T019) run in parallel after the schema/migration (T009–T010).
-- Within US1, all `[P]` static section pages (T024–T029, T032, T033, T035) run in parallel after components (T021–T022).
-- Across teams: once Foundational is done, US1 and US2 can be built in parallel by different developers; US3 follows US2.
-
----
-
-## Parallel Example: User Story 1
-
-```bash
-# After T021–T022 (shared components) are done, build static section pages in parallel:
-Task: "About page in app/[locale]/(site)/about/page.tsx"          # T024
-Task: "Services page in app/[locale]/(site)/services/page.tsx"     # T025
-Task: "Creative Process page in app/[locale]/(site)/process/page.tsx" # T026
-Task: "Production page in app/[locale]/(site)/production/page.tsx"  # T027
-Task: "Brand Experiences page in app/[locale]/(site)/experiences/page.tsx" # T028
-Task: "Our Tribe page in app/[locale]/(site)/tribe/page.tsx"        # T029
+```
+Setup → Foundational → ├─ US1 (P1, MVP) ─┐
+                       ├─ US2 (P2) ──────┤→ Polish
+                       ├─ US3 (P2) ──────┤
+                       └─ US4 (P3) ──────┘
 ```
 
----
+## Parallel Execution Examples
+
+- **Setup**: T002, T003, T004 in parallel after T001.
+- **Foundational**: T008, T012, T013, T015 in parallel (distinct files) while T005–T007/T009–T011 proceed in dependency order.
+- **US1 pages**: T027–T032 are all `[P]` (separate page files) once chrome (T020–T025) and the hero (T016–T019) land.
+- **Cross-story**: once Phase 2 is done, an US2 worker (admin forms), an US3 worker (branding), and an US4 worker (verification) can run alongside the US1 worker.
 
 ## Implementation Strategy
 
-### MVP First (User Story 1 only)
-
-1. Complete Phase 1 (Setup) + Phase 2 (Foundational).
-2. Complete Phase 3 (US1) → public bilingual site on seeded content.
-3. **STOP and VALIDATE**: run the visitor-journey e2e in EN + AR; deploy/demo the MVP.
-
-### Incremental Delivery
-
-1. Foundation ready → US1 (MVP, public site) → demo.
-2. US2 (editor CRUD) → demo self-service content.
-3. US3 (branding/settings) → demo full no-code control.
-4. US4 (users/roles) → enable multi-user operation.
-5. Polish (Phase 7) → accessibility/perf gates + production Docker verification before launch.
-
-### Constitution gates (must pass before launch)
-
-- Bilingual parity enforced on publish (T038/T046 schemas).
-- Lighthouse Perf + A11y ≥ 90 (T058).
-- Server-side role enforcement verified (T053/T056).
-- Critical-path e2e green (T020, T037, T045, T053).
-
----
+- **MVP = Phase 1 + Phase 2 + Phase 3 (US1)** — the redesigned English-only public site with the Bauhaus system and interactive river hero. Shippable on its own.
+- **Increment 2** = US2 + US3 (admin alignment to English-only + Bauhaus branding).
+- **Increment 3** = US4 (user-management verification) + Phase 7 polish/gates.
+- Keep AR DB columns until the redesign is confirmed in production; schedule a later non-destructive migration to drop them.
 
 ## Notes
 
-- Total tasks: **62** (Setup 8, Foundational 11, US1 17, US2 8, US3 8, US4 4, Polish 6).
-- `[P]` = different files, no incomplete-task dependency.
-- `[US#]` labels map tasks to spec.md user stories for traceability.
-- Commit after each task or logical group; the optional `before_implement` git hook can auto-commit.
-- Each user story is an independently demoable increment.
+- This is a **delta** on a working codebase — prefer MODIFY over rewrite; match existing file conventions.
+- No hard-coded brand values in components (Constitution VI) — everything Bauhaus flows from `BrandSettings`/CSS vars.
+- Re-validate the Constitution Check in `plan.md` against **v2.0.0** before `/speckit-implement`.

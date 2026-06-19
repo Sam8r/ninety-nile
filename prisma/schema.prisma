@@ -1,5 +1,7 @@
-// Prisma schema for NinetyNile — bilingual (EN/AR) agency website + admin dashboard.
-// Bilingual fields use paired columns: <field>En / <field>Ar.
+// Prisma schema for NinetyNile — English-only agency website + admin dashboard (Bauhaus redesign).
+// NOTE: All *Ar columns are deprecated (English-only redesign). They are kept nullable
+// for non-destructive migration and will be dropped in a later cleanup migration.
+// deprecated: English-only redesign
 
 generator client {
   provider      = "prisma-client-js"

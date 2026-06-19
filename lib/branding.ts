@@ -4,11 +4,8 @@ import type { BrandSettings } from "@prisma/client";
 
 export type BrandTokens = {
   siteNameEn: string;
-  siteNameAr: string;
   taglineEn: string;
-  taglineAr: string;
   secondaryTaglineEn: string | null;
-  secondaryTaglineAr: string | null;
   colorPrimary: string;
   colorSecondary: string;
   colorAccent: string;
@@ -18,30 +15,35 @@ export type BrandTokens = {
   fontBody: string;
 };
 
+/** Bauhaus defaults — black/white base with red/blue/yellow accents. */
 const FALLBACK: BrandTokens = {
   siteNameEn: "NinetyNile",
-  siteNameAr: "ناينتي نايل",
   taglineEn: "Creativity, Overflowing.",
-  taglineAr: "الإبداع يفيض.",
-  secondaryTaglineEn: null,
-  secondaryTaglineAr: null,
-  colorPrimary: "#1a202c",
-  colorSecondary: "#0e7490",
-  colorAccent: "#e8722a",
-  colorBg: "#faf8f4",
-  colorText: "#1a202c",
-  fontHeading: "Inter",
+  secondaryTaglineEn:
+    "A boutique creative communication consultancy and content creation agency — rooted in Sudan, working across the globe.",
+  colorPrimary: "#0a0a0a",
+  colorSecondary: "#005fa8",
+  colorAccent: "#e10600",
+  colorBg: "#ffffff",
+  colorText: "#0a0a0a",
+  fontHeading: "Space Grotesk",
   fontBody: "Inter",
 };
 
-export function brandToCssVars(brand: Pick<
-  BrandSettings,
-  "colorPrimary" | "colorSecondary" | "colorAccent" | "colorBg" | "colorText"
->): Record<string, string> {
+/** Bauhaus yellow is a design-system constant (not yet admin-configurable). */
+const BAUHAUS_YELLOW = "#ffd500";
+
+export function brandToCssVars(
+  brand: Pick<
+    BrandSettings,
+    "colorPrimary" | "colorSecondary" | "colorAccent" | "colorBg" | "colorText"
+  >,
+): Record<string, string> {
   return {
     "--brand-primary": brand.colorPrimary,
     "--brand-secondary": brand.colorSecondary,
     "--brand-accent": brand.colorAccent,
+    "--brand-yellow": BAUHAUS_YELLOW,
     "--brand-bg": brand.colorBg,
     "--brand-text": brand.colorText,
   };
@@ -55,11 +57,8 @@ export async function getBrandTokens(): Promise<BrandTokens> {
     if (!brand) return FALLBACK;
     return {
       siteNameEn: brand.siteNameEn,
-      siteNameAr: brand.siteNameAr ?? FALLBACK.siteNameAr,
       taglineEn: brand.taglineEn,
-      taglineAr: brand.taglineAr ?? FALLBACK.taglineAr,
       secondaryTaglineEn: brand.secondaryTaglineEn,
-      secondaryTaglineAr: brand.secondaryTaglineAr,
       colorPrimary: brand.colorPrimary,
       colorSecondary: brand.colorSecondary,
       colorAccent: brand.colorAccent,
@@ -73,9 +72,11 @@ export async function getBrandTokens(): Promise<BrandTokens> {
   }
 }
 
-export function brandStyle(brand: Pick<
-  BrandSettings,
-  "colorPrimary" | "colorSecondary" | "colorAccent" | "colorBg" | "colorText"
->): React.CSSProperties {
+export function brandStyle(
+  brand: Pick<
+    BrandSettings,
+    "colorPrimary" | "colorSecondary" | "colorAccent" | "colorBg" | "colorText"
+  >,
+): React.CSSProperties {
   return brandToCssVars(brand) as React.CSSProperties;
 }

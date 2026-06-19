@@ -1,13 +1,11 @@
 import NextAuth from "next-auth";
-import createIntlMiddleware from "next-intl/middleware";
 import { NextResponse } from "next/server";
 import { authConfig } from "@/lib/auth.config";
-import { routing } from "@/lib/i18n/routing";
 
 const { auth } = NextAuth(authConfig);
-const intlMiddleware = createIntlMiddleware(routing);
 
-const PUBLIC_FILE = /\.(?!well-known\/).*(?:svg|png|jpg|jpeg|gif|webp|avif|ico|txt|xml|webmanifest|css|js|map)$/;
+const PUBLIC_FILE =
+  /\.(?!well-known\/).*(?:svg|png|jpg|jpeg|gif|webp|avif|ico|txt|xml|webmanifest|css|js|map)$/;
 const ADMIN_PATH = /^\/admin(?:\/|$)/;
 
 export default auth((req) => {
@@ -41,7 +39,7 @@ export default auth((req) => {
     return NextResponse.next();
   }
 
-  return intlMiddleware(req);
+  return NextResponse.next();
 });
 
 export const config = {

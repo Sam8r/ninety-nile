@@ -12,11 +12,6 @@ function isYouTube(url: string): { id: string } | null {
   return m ? { id: m[1]! } : null;
 }
 
-/**
- * Case-study videos are embedded from external platforms (YouTube/Instagram/TikTok)
- * per the agency profile — the site stores posters/thumbnails, not video files.
- * Renders a list of "Watch on…" links (privacy-friendly, no third-party JS).
- */
 export function ExternalVideoEmbed({ links }: ExternalVideoEmbedProps) {
   if (!links || links.length === 0) return null;
 
@@ -31,7 +26,7 @@ export function ExternalVideoEmbed({ links }: ExternalVideoEmbedProps) {
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
+            className="inline-flex items-center gap-2 border-2 border-black bg-accent px-4 py-2 text-sm font-bold text-accent-foreground transition-shadow hover:shadow-[4px_4px_0_0_#000]"
           >
             <Play className="size-4" />
             {label}

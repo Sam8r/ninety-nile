@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { ui } from "@/lib/content/ui";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-export function ContactForm({ locale }: { locale: string }) {
-  const t = useTranslations("Contact");
+export function ContactForm() {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
 
@@ -20,7 +19,7 @@ export function ContactForm({ locale }: { locale: string }) {
       name: String(formData.get("name") ?? ""),
       email: String(formData.get("email") ?? ""),
       message: String(formData.get("message") ?? ""),
-      locale,
+      locale: "en",
       hp: String(formData.get("hp") ?? ""),
     };
 
@@ -33,13 +32,13 @@ export function ContactForm({ locale }: { locale: string }) {
         });
         const data = await res.json();
         if (data.ok) {
-          setResult({ ok: true, message: t("success") });
+          setResult({ ok: true, message: ui.contact.success });
           (e.target as HTMLFormElement).reset();
         } else {
-          setResult({ ok: false, message: t("error") });
+          setResult({ ok: false, message: ui.contact.error });
         }
       } catch {
-        setResult({ ok: false, message: t("error") });
+        setResult({ ok: false, message: ui.contact.error });
       }
     });
   }
@@ -53,16 +52,16 @@ export function ContactForm({ locale }: { locale: string }) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="name">{t("name")}</Label>
-        <Input id="name" name="name" required maxLength={120} />
+        <Label htmlFor="name">{ui.contact.name}</Label>
+        <Input id="name" name="name" required maxLength={120} placeholder={ui.contact.namePlaceholder} />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="email">{t("email")}</Label>
-        <Input id="email" name="email" type="email" required maxLength={200} />
+        <Label htmlFor="email">{ui.contact.email}</Label>
+        <Input id="email" name="email" type="email" required maxLength={200} placeholder={ui.contact.emailPlaceholder} />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="message">{t("message")}</Label>
-        <Textarea id="message" name="message" required maxLength={5000} rows={5} />
+        <Label htmlFor="message">{ui.contact.message}</Label>
+        <Textarea id="message" name="message" required maxLength={5000} rows={5} placeholder={ui.contact.messagePlaceholder} />
       </div>
 
       {result && (
@@ -79,7 +78,7 @@ export function ContactForm({ locale }: { locale: string }) {
       )}
 
       <Button type="submit" variant="accent" disabled={isPending}>
-        {isPending ? t("sending") : t("send")}
+        {isPending ? ui.contact.sending : ui.contact.send}
       </Button>
     </form>
   );

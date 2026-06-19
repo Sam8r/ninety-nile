@@ -51,19 +51,28 @@ const config: Config = {
           foreground: "hsl(var(--popover-foreground))",
         },
         brand: {
-          primary: "hsl(var(--brand-primary))",
-          secondary: "hsl(var(--brand-secondary))",
-          accent: "hsl(var(--brand-accent))",
+          primary: "var(--brand-primary)",
+          secondary: "var(--brand-secondary)",
+          accent: "var(--brand-accent)",
+          yellow: "var(--brand-yellow)",
+          bg: "var(--brand-bg)",
+          text: "var(--brand-text)",
         },
       },
       borderRadius: {
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) + 2px)",
+        sm: "calc(var(--radius) + 4px)",
       },
       fontFamily: {
         heading: ["var(--font-heading)", "sans-serif"],
         body: ["var(--font-body)", "sans-serif"],
+      },
+      fontSize: {
+        "display-sm": ["3rem", { lineHeight: "0.95", letterSpacing: "-0.02em" }],
+        "display-md": ["4.5rem", { lineHeight: "0.95", letterSpacing: "-0.03em" }],
+        "display-lg": ["6rem", { lineHeight: "0.9", letterSpacing: "-0.04em" }],
+        "display-xl": ["8rem", { lineHeight: "0.85", letterSpacing: "-0.05em" }],
       },
       keyframes: {
         "accordion-down": {
@@ -78,11 +87,16 @@ const config: Config = {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
+        flow: {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.5s ease-out",
+        flow: "flow 6s ease-in-out infinite",
       },
     },
   },

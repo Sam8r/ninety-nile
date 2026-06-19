@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { slugSchema, externalLinksSchema, orderSchema, bilingualPublishErrors } from "@/lib/validation";
+import { slugSchema, externalLinksSchema, orderSchema, publishErrors } from "@/lib/validation";
 
 export const projectSchema = z.object({
   slug: slugSchema,
@@ -15,13 +15,10 @@ export const projectSchema = z.object({
 
 export type ProjectInput = z.infer<typeof projectSchema>;
 
-const PUBLISH_PAIRS = [
-  ["titleEn", "titleAr"],
-  ["descriptionEn", "descriptionAr"],
-] as const;
+const PUBLISH_FIELDS = ["titleEn", "descriptionEn"] as const;
 
 export function validateProjectPublish(input: ProjectInput): Record<string, string[]> {
-  const errs = bilingualPublishErrors(input as unknown as Record<string, unknown>, PUBLISH_PAIRS);
+  const errs = publishErrors(input as unknown as Record<string, unknown>, PUBLISH_FIELDS);
   if (errs.length === 0) return {};
   const fieldErrors: Record<string, string[]> = {};
   for (const e of errs) {

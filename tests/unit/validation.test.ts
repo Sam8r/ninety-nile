@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { slugSchema, hexColorSchema, urlSchema, sanitizeRichText, bilingualPublishErrors } from "@/lib/validation";
+import { slugSchema, hexColorSchema, urlSchema, sanitizeRichText, publishErrors } from "@/lib/validation";
 
 describe("slugSchema", () => {
   it("accepts valid kebab-case", () => {
@@ -89,36 +89,44 @@ describe("sanitizeRichText", () => {
   });
 });
 
-describe("bilingualPublishErrors", () => {
-  it("returns no errors when both EN and AR are present and publishing", () => {
-    const result = bilingualPublishErrors(
-      { status: "PUBLISHED", titleEn: "Hello", titleAr: "مرحبا" },
-      [["titleEn", "titleAr"]],
+describe("publishErrors (English-only)", () => {
+  it("returns no errors when English field is present and publishing", () => {
+    const result = publishErrors(
+      { status: "PUBLISHED", titleEn: "Hello" },
+      ["titleEn"],
     );
     expect(result).toHaveLength(0);
   });
 
-  it("flags missing AR field when publishing", () => {
-    const result = bilingualPublishErrors(
-      { status: "PUBLISHED", titleEn: "Hello", titleAr: "" },
-      [["titleEn", "titleAr"]],
+  it("flags missing English field when publishing", () => {
+    const result = publishErrors(
+      { status: "PUBLISHED", titleEn: "" },
+      ["titleEn"],
     );
     expect(result).toHaveLength(1);
-    expect(result[0]).toContain("titleAr");
+    expect(result[0]).toContain("titleEn");
   });
 
   it("does NOT flag missing fields when draft", () => {
-    const result = bilingualPublishErrors(
-      { status: "DRAFT", titleEn: "Hello", titleAr: "" },
-      [["titleEn", "titleAr"]],
+    const result = publishErrors(
+      { status: "DRAFT", titleEn: "" },
+      ["titleEn"],
     );
     expect(result).toHaveLength(0);
   });
 
-  it("flags both EN and AR when both empty", () => {
-    const result = bilingualPublishErrors(
-      { status: "PUBLISHED", titleEn: "  ", titleAr: "" },
-      [["titleEn", "titleAr"]],
+  it("flags whitespace-only English field when publishing", () => {
+    const result = publishErrors(
+      { status: "PUBLISHED", titleEn: "  " },
+      ["titleEn"],
+    );
+    expect(result).toHaveLength(1);
+  });
+
+  it("flags multiple missing fields", () => {
+    const result = publishErrors(
+      { status: "PUBLISHED", titleEn: "", summaryEn: "" },
+      ["titleEn", "summaryEn"],
     );
     expect(result).toHaveLength(2);
   });

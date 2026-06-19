@@ -56,7 +56,7 @@ export function ProjectForm({ id, initial }: { id?: string; initial?: Partial<Pr
     <form onSubmit={onSubmit} className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2">
         <div>
-          <Label htmlFor="titleEn">Title (English) *</Label>
+          <Label htmlFor="titleEn">Title *</Label>
           <Input
             id="titleEn"
             required
@@ -69,19 +69,6 @@ export function ProjectForm({ id, initial }: { id?: string; initial?: Partial<Pr
           />
         </div>
         <div>
-          <Label htmlFor="titleAr">Title (Arabic)</Label>
-          <Input
-            id="titleAr"
-            value={form.titleAr}
-            onChange={(e) => set("titleAr", e.target.value)}
-            dir="rtl"
-            className="mt-1"
-          />
-        </div>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
           <Label htmlFor="slug">Slug *</Label>
           <Input
             id="slug"
@@ -92,6 +79,9 @@ export function ProjectForm({ id, initial }: { id?: string; initial?: Partial<Pr
           />
           {errors.slug && <p className="mt-1 text-xs text-destructive">{errors.slug}</p>}
         </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
           <Label htmlFor="status">Status</Label>
           <select
@@ -106,28 +96,15 @@ export function ProjectForm({ id, initial }: { id?: string; initial?: Partial<Pr
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <Label htmlFor="descriptionEn">Description (English)</Label>
-          <Textarea
-            id="descriptionEn"
-            rows={5}
-            value={form.descriptionEn}
-            onChange={(e) => set("descriptionEn", e.target.value)}
-            className="mt-1"
-          />
-        </div>
-        <div>
-          <Label htmlFor="descriptionAr">Description (Arabic)</Label>
-          <Textarea
-            id="descriptionAr"
-            rows={5}
-            dir="rtl"
-            value={form.descriptionAr}
-            onChange={(e) => set("descriptionAr", e.target.value)}
-            className="mt-1"
-          />
-        </div>
+      <div>
+        <Label htmlFor="descriptionEn">Description</Label>
+        <Textarea
+          id="descriptionEn"
+          rows={5}
+          value={form.descriptionEn}
+          onChange={(e) => set("descriptionEn", e.target.value)}
+          className="mt-1"
+        />
       </div>
 
       <MediaPicker label="Hero image" value={form.heroMediaId ?? ""} onChange={(v) => set("heroMediaId", (v as string) || "")} />

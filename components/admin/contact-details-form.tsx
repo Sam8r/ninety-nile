@@ -19,7 +19,6 @@ export function ContactDetailsForm({ initial }: { initial: ContactDetails | null
     instagram: initial?.instagram ?? "",
     tiktok: initial?.tiktok ?? "",
     addressesEn: ((initial?.addressesEn as string[]) ?? []).join("\n"),
-    addressesAr: ((initial?.addressesAr as string[]) ?? []).join("\n"),
   });
 
   function set(key: keyof typeof form, value: string) {
@@ -32,7 +31,6 @@ export function ContactDetailsForm({ initial }: { initial: ContactDetails | null
       const res = await updateContactDetails({
         ...form,
         addressesEn: form.addressesEn.split("\n").map((s) => s.trim()).filter(Boolean),
-        addressesAr: form.addressesAr.split("\n").map((s) => s.trim()).filter(Boolean),
       });
       if (res.ok) router.refresh();
     });
@@ -64,15 +62,9 @@ export function ContactDetailsForm({ initial }: { initial: ContactDetails | null
         <Label>TikTok URL</Label>
         <Input value={form.tiktok} onChange={(e) => set("tiktok", e.target.value)} className="mt-1" />
       </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        <div>
-          <Label>Addresses (EN, one per line)</Label>
-          <Textarea value={form.addressesEn} onChange={(e) => set("addressesEn", e.target.value)} rows={4} className="mt-1" />
-        </div>
-        <div>
-          <Label>Addresses (AR, one per line)</Label>
-          <Textarea dir="rtl" value={form.addressesAr} onChange={(e) => set("addressesAr", e.target.value)} rows={4} className="mt-1" />
-        </div>
+      <div>
+        <Label>Addresses (one per line)</Label>
+        <Textarea value={form.addressesEn} onChange={(e) => set("addressesEn", e.target.value)} rows={4} className="mt-1" />
       </div>
       <Button type="submit" variant="accent" disabled={isPending}>
         {isPending ? "Saving…" : "Save contact details"}

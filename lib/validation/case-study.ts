@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { slugSchema, externalLinksSchema, orderSchema, bilingualPublishErrors } from "@/lib/validation";
+import { slugSchema, externalLinksSchema, orderSchema, publishErrors } from "@/lib/validation";
 
 export const caseStudySchema = z.object({
   slug: slugSchema,
@@ -36,18 +36,12 @@ export const caseStudySchema = z.object({
 
 export type CaseStudyInput = z.infer<typeof caseStudySchema>;
 
-/** Paired EN/AR fields that must BOTH be present when publishing. */
-const PUBLISH_PAIRS = [
-  ["titleEn", "titleAr"],
-  ["summaryEn", "summaryAr"],
-  ["challengeEn", "challengeAr"],
-  ["solutionEn", "solutionAr"],
-  ["resultsEn", "resultsAr"],
-] as const;
+/** English fields required for publishing. */
+const PUBLISH_FIELDS = ["titleEn", "summaryEn", "challengeEn", "solutionEn", "resultsEn"] as const;
 
-/** Returns field-level errors if the publish gate (bilingual parity) fails. */
+/** Returns field-level errors if the English-only publish gate fails. */
 export function validateCaseStudyPublish(input: CaseStudyInput): Record<string, string[]> {
-  const errs = bilingualPublishErrors(input as unknown as Record<string, unknown>, PUBLISH_PAIRS);
+  const errs = publishErrors(input as unknown as Record<string, unknown>, PUBLISH_FIELDS);
   if (errs.length === 0) return {};
   const fieldErrors: Record<string, string[]> = {};
   for (const e of errs) {

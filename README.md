@@ -1,14 +1,15 @@
-# NinetyNile — Bilingual Agency Website + Admin Dashboard
+# NinetyNile — Creative Agency Website + Admin Dashboard
 
-A bilingual (EN/AR, RTL-aware) creative agency website with a role-based admin dashboard for full no-code content management.
+An English-only, Bauhaus-styled creative agency website with a role-based admin dashboard for full no-code content management. Features a signature interactive Three.js flowing-river hero, imagery sourced from the company-profile PDF, and a data-driven Bauhaus design system.
 
 ## Tech Stack
 
 - **Framework**: Next.js 15 (App Router, React 19, TypeScript strict)
 - **Database**: PostgreSQL 16 + Prisma ORM
 - **Auth**: Auth.js v5 (credentials provider, ADMIN/EDITOR roles)
-- **i18n**: next-intl (locale routing, RTL support)
-- **UI**: Tailwind CSS + shadcn/ui components
+- **UI**: Tailwind CSS + shadcn/ui components, Bauhaus design system
+- **WebGL**: Three.js + @react-three/fiber (dynamically imported river hero)
+- **Fonts**: Space Grotesk (display) + Inter (body) via next/font
 - **Deploy**: Self-hosted Docker (standalone Next.js + Postgres + media volume)
 
 ## Quick Start
@@ -39,7 +40,7 @@ pnpm prisma:seed
 pnpm dev
 ```
 
-- Public site: http://localhost:3000/en (English) / http://localhost:3000/ar (Arabic, RTL)
+- Public site: http://localhost:3000 (English-only, no locale prefix)
 - Admin dashboard: http://localhost:3000/admin
 - Default admin: `admin@ninetynile.com` / `ChangeMeNow123`
 - Default editor: `editor@ninetynile.com` / `EditorPass123`
@@ -63,38 +64,44 @@ pnpm dev
 
 ```
 app/
-  [locale]/(site)/     # Public website (EN + AR, RTL)
+  (site)/              # Public website (English-only, Bauhaus)
   admin/(dashboard)/   # Admin dashboard (auth-protected)
   api/                 # API routes (contact, media, auth)
 components/
   ui/                  # shadcn/ui primitives
   site/                # Public site components
+    river-hero/        # Three.js flowing-river hero (water-material, fallback, component)
   admin/               # Admin dashboard components
 lib/
   actions/             # Server actions (CRUD)
-  validation/          # Zod schemas
+  validation/          # Zod schemas (English-only publish gate)
+  content/             # UI string dictionary + text helpers
   auth.ts              # Auth.js config (node runtime)
   auth.config.ts       # Edge-safe auth config
   auth-guards.ts       # Role-based guards (requireAdmin, requireSession)
-  branding.ts          # Brand tokens + CSS vars
+  branding.ts          # Bauhaus brand tokens + CSS vars
   db.ts                # Prisma client
-  i18n/                # next-intl routing + config
 prisma/
-  schema.prisma        # Full data model
+  schema.prisma        # Full data model (*Ar columns deprecated/nullable)
   seed.ts              # Content seed (9 case studies, services, clients, etc.)
-public/brand/          # Logo assets
+public/
+  brand/               # Logo assets (NN_Logos-*, optimized variants)
+  media/curated/       # Curated, optimized PDF-sourced imagery
 tests/
   unit/                # Vitest unit tests
+  e2e/                 # Playwright e2e tests
 ```
 
 ## Key Features
 
-- **Bilingual publish gate**: Case studies and content require both EN + AR fields before publishing
+- **Bauhaus design system**: White/black base with red/blue/yellow accents, oversized geometric headlines, generous white space — all driven by `BrandSettings` tokens (no hard-coded values)
+- **Interactive river hero**: Three.js flowing-water shader in the lower third of the homepage hero, reacting to mouse and touch; progressively enhanced with reduced-motion and no-WebGL fallbacks
+- **English-only publish gate**: Case studies and content require English fields before publishing
 - **Role-based access**: ADMIN (full access) vs EDITOR (content only); enforced server-side
-- **Live branding**: Change tagline, colors, logo from admin → reflected on public site instantly
-- **Media management**: Upload, crop, and serve optimized images (sharp)
+- **Live branding**: Change tagline, Bauhaus colors, logo from admin, reflected on public site instantly
+- **Media management**: Upload, optimize, and serve images (sharp + next/image)
 - **SEO**: Dynamic sitemap, robots.txt, per-page metadata
-- **Security**: Rate-limited login, XSS sanitization, security headers (CSP-ready)
+- **Security**: Rate-limited login, XSS sanitization, security headers
 
 ## Production Docker Deploy
 

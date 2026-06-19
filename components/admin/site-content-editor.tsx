@@ -13,13 +13,11 @@ export function SiteContentEditor({ content }: { content: SiteContent }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [titleEn, setTitleEn] = useState(content.titleEn ?? "");
-  const [titleAr, setTitleAr] = useState(content.titleAr ?? "");
   const [bodyEn, setBodyEn] = useState(content.bodyEn ?? "");
-  const [bodyAr, setBodyAr] = useState(content.bodyAr ?? "");
 
   function save() {
     startTransition(async () => {
-      const res = await updateSiteContent(content.key, { titleEn, titleAr, bodyEn, bodyAr });
+      const res = await updateSiteContent(content.key, { titleEn, bodyEn });
       if (res.ok) router.refresh();
     });
   }
@@ -34,23 +32,13 @@ export function SiteContentEditor({ content }: { content: SiteContent }) {
       </div>
       <div className="grid gap-3 md:grid-cols-2">
         <div>
-          <Label>Title (EN)</Label>
+          <Label>Title</Label>
           <Input value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="mt-1" />
         </div>
-        <div>
-          <Label>Title (AR)</Label>
-          <Input value={titleAr} onChange={(e) => setTitleAr(e.target.value)} dir="rtl" className="mt-1" />
-        </div>
       </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        <div>
-          <Label>Body (EN)</Label>
-          <Textarea rows={5} value={bodyEn} onChange={(e) => setBodyEn(e.target.value)} className="mt-1" />
-        </div>
-        <div>
-          <Label>Body (AR)</Label>
-          <Textarea rows={5} dir="rtl" value={bodyAr} onChange={(e) => setBodyAr(e.target.value)} className="mt-1" />
-        </div>
+      <div>
+        <Label>Body</Label>
+        <Textarea rows={5} value={bodyEn} onChange={(e) => setBodyEn(e.target.value)} className="mt-1" />
       </div>
     </div>
   );

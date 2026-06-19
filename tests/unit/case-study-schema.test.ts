@@ -52,46 +52,47 @@ describe("caseStudySchema", () => {
   });
 });
 
-describe("validateCaseStudyPublish", () => {
-  it("returns no errors for a fully bilingual published case study", () => {
+describe("validateCaseStudyPublish (English-only)", () => {
+  it("returns no errors for a fully English published case study", () => {
     const input = caseStudySchema.parse({
       ...validDraft,
       status: "PUBLISHED",
-      titleAr: "دراسة حالة",
       summaryEn: "Summary",
-      summaryAr: "ملخص",
       challengeEn: "Challenge",
-      challengeAr: "تحدي",
       solutionEn: "Solution",
-      solutionAr: "حل",
       resultsEn: "Results",
-      resultsAr: "نتائج",
     });
     expect(validateCaseStudyPublish(input)).toEqual({});
   });
 
-  it("flags missing Arabic title when publishing", () => {
+  it("does NOT flag missing Arabic title when publishing", () => {
     const input = caseStudySchema.parse({
       ...validDraft,
       status: "PUBLISHED",
       titleAr: "",
+      summaryEn: "Summary",
+      challengeEn: "Challenge",
+      solutionEn: "Solution",
+      resultsEn: "Results",
     });
     const errors = validateCaseStudyPublish(input);
-    expect(errors.titleAr).toBeDefined();
+    expect(errors.titleAr).toBeUndefined();
   });
 
   it("flags missing English summary when publishing", () => {
     const input = caseStudySchema.parse({
       ...validDraft,
       status: "PUBLISHED",
-      titleAr: "دراسة",
       summaryEn: "",
+      challengeEn: "Challenge",
+      solutionEn: "Solution",
+      resultsEn: "Results",
     });
     const errors = validateCaseStudyPublish(input);
     expect(errors.summaryEn).toBeDefined();
   });
 
-  it("does NOT enforce bilingual parity for drafts", () => {
+  it("does NOT enforce English completeness for drafts", () => {
     const input = caseStudySchema.parse({
       ...validDraft,
       status: "DRAFT",
@@ -100,23 +101,18 @@ describe("validateCaseStudyPublish", () => {
     expect(validateCaseStudyPublish(input)).toEqual({});
   });
 
-  it("flags all missing paired fields when publishing with only English", () => {
+  it("flags all missing English fields when publishing", () => {
     const input = caseStudySchema.parse({
       ...validDraft,
       status: "PUBLISHED",
-      titleAr: "",
-      summaryEn: "Summary",
-      summaryAr: "",
-      challengeEn: "Challenge",
-      challengeAr: "",
-      solutionEn: "Solution",
-      solutionAr: "",
-      resultsEn: "Results",
-      resultsAr: "",
+      summaryEn: "",
+      challengeEn: "",
+      solutionEn: "",
+      resultsEn: "",
     });
     const errors = validateCaseStudyPublish(input);
     expect(Object.keys(errors).sort()).toEqual(
-      ["challengeAr", "resultsAr", "solutionAr", "summaryAr", "titleAr"].sort(),
+      ["challengeEn", "resultsEn", "solutionEn", "summaryEn"].sort(),
     );
   });
 });

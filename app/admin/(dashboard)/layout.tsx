@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
 import {
   LayoutDashboard,
   Film,
@@ -16,6 +15,7 @@ import {
   UserCog,
 } from "lucide-react";
 import { requireSession } from "@/lib/auth-guards";
+import { ui } from "@/lib/content/ui";
 import { SignOutButton } from "@/components/admin/sign-out-button";
 
 export const metadata = {
@@ -24,25 +24,25 @@ export const metadata = {
 
 type NavEntry = {
   href: string;
-  labelKey: string;
-  icon: React.ElementType;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
   adminOnly?: boolean;
 };
 
 const NAV: ReadonlyArray<NavEntry> = [
-  { href: "/admin", labelKey: "navOverview", icon: LayoutDashboard },
-  { href: "/admin/case-studies", labelKey: "navCaseStudies", icon: Film },
-  { href: "/admin/projects", labelKey: "navProjects", icon: FolderKanban },
-  { href: "/admin/media", labelKey: "navMedia", icon: ImageIcon },
-  { href: "/admin/services", labelKey: "navServices", icon: Sparkles },
-  { href: "/admin/process", labelKey: "navProcess", icon: Workflow },
-  { href: "/admin/tribe", labelKey: "navTribe", icon: Users },
-  { href: "/admin/clients", labelKey: "navClients", icon: Building2 },
-  { href: "/admin/testimonials", labelKey: "navTestimonials", icon: Quote },
-  { href: "/admin/branding", labelKey: "navBranding", icon: Palette, adminOnly: true },
-  { href: "/admin/content", labelKey: "navContent", icon: FileText, adminOnly: true },
-  { href: "/admin/contact", labelKey: "navContact", icon: Mail, adminOnly: true },
-  { href: "/admin/users", labelKey: "navUsers", icon: UserCog, adminOnly: true },
+  { href: "/admin", label: ui.admin.navOverview, icon: LayoutDashboard },
+  { href: "/admin/case-studies", label: ui.admin.navCaseStudies, icon: Film },
+  { href: "/admin/projects", label: ui.admin.navProjects, icon: FolderKanban },
+  { href: "/admin/media", label: ui.admin.navMedia, icon: ImageIcon },
+  { href: "/admin/services", label: ui.admin.navServices, icon: Sparkles },
+  { href: "/admin/process", label: ui.admin.navProcess, icon: Workflow },
+  { href: "/admin/tribe", label: ui.admin.navTribe, icon: Users },
+  { href: "/admin/clients", label: ui.admin.navClients, icon: Building2 },
+  { href: "/admin/testimonials", label: ui.admin.navTestimonials, icon: Quote },
+  { href: "/admin/branding", label: ui.admin.navBranding, icon: Palette, adminOnly: true },
+  { href: "/admin/content", label: ui.admin.navContent, icon: FileText, adminOnly: true },
+  { href: "/admin/contact", label: ui.admin.navContact, icon: Mail, adminOnly: true },
+  { href: "/admin/users", label: ui.admin.navUsers, icon: UserCog, adminOnly: true },
 ];
 
 export default async function AdminLayout({
@@ -51,7 +51,6 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const user = await requireSession("/admin");
-  const t = await getTranslations("Admin");
 
   return (
     <div className="min-h-dvh bg-muted/30">
@@ -72,7 +71,7 @@ export default async function AdminLayout({
                   className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                 >
                   <Icon className="size-4" />
-                  {t(entry.labelKey)}
+                  {entry.label}
                 </Link>
               );
             })}
@@ -85,7 +84,7 @@ export default async function AdminLayout({
                 {user.role}
               </p>
             </div>
-            <SignOutButton label={t("signOut")} />
+            <SignOutButton label={ui.admin.signOut} />
           </div>
         </aside>
 
@@ -94,7 +93,7 @@ export default async function AdminLayout({
             <Link href="/admin" className="font-heading text-base font-bold">
               NinetyNile
             </Link>
-            <SignOutButton label={t("signOut")} compact />
+            <SignOutButton label={ui.admin.signOut} compact />
           </header>
           <main className="flex-1 p-4 lg:p-8">{children}</main>
         </div>

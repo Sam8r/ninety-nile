@@ -65,33 +65,17 @@ export function BrandingForm({ initial }: { initial: BrandSettings | null }) {
         <legend className="px-1 font-heading text-sm font-semibold">Identity</legend>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <Label htmlFor="siteNameEn">Site name (English) *</Label>
+            <Label htmlFor="siteNameEn">Site name *</Label>
             <Input id="siteNameEn" required value={form.siteNameEn} onChange={(e) => set("siteNameEn", e.target.value)} className="mt-1" />
           </div>
           <div>
-            <Label htmlFor="siteNameAr">Site name (Arabic)</Label>
-            <Input id="siteNameAr" dir="rtl" value={form.siteNameAr} onChange={(e) => set("siteNameAr", e.target.value)} className="mt-1" />
-          </div>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <Label htmlFor="taglineEn">Tagline (English) *</Label>
+            <Label htmlFor="taglineEn">Tagline *</Label>
             <Input id="taglineEn" required value={form.taglineEn} onChange={(e) => set("taglineEn", e.target.value)} className="mt-1" />
           </div>
-          <div>
-            <Label htmlFor="taglineAr">Tagline (Arabic)</Label>
-            <Input id="taglineAr" dir="rtl" value={form.taglineAr} onChange={(e) => set("taglineAr", e.target.value)} className="mt-1" />
-          </div>
         </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <Label htmlFor="secondaryTaglineEn">Secondary tagline (English)</Label>
-            <Input id="secondaryTaglineEn" value={form.secondaryTaglineEn} onChange={(e) => set("secondaryTaglineEn", e.target.value)} className="mt-1" />
-          </div>
-          <div>
-            <Label htmlFor="secondaryTaglineAr">Secondary tagline (Arabic)</Label>
-            <Input id="secondaryTaglineAr" dir="rtl" value={form.secondaryTaglineAr} onChange={(e) => set("secondaryTaglineAr", e.target.value)} className="mt-1" />
-          </div>
+        <div>
+          <Label htmlFor="secondaryTaglineEn">Secondary tagline</Label>
+          <Input id="secondaryTaglineEn" value={form.secondaryTaglineEn} onChange={(e) => set("secondaryTaglineEn", e.target.value)} className="mt-1" />
         </div>
       </fieldset>
 

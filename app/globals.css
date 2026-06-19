@@ -4,47 +4,48 @@
 
 @layer base {
   :root {
-    /* Default brand palette (overridden at runtime by BrandSettings CSS vars).
-       Values below map to the seed brand: NinetyNile warm earth + nile-blue. */
-    --background: 30 33% 98%;
-    --foreground: 200 20% 12%;
+    /* Bauhaus palette — white on black with primary red/blue/yellow accents.
+       Overridden at runtime by BrandSettings CSS vars. */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 4%;
 
     --card: 0 0% 100%;
-    --card-foreground: 200 20% 12%;
+    --card-foreground: 0 0% 4%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 200 20% 12%;
+    --popover-foreground: 0 0% 4%;
 
-    --primary: 200 20% 12%;
-    --primary-foreground: 30 33% 98%;
+    --primary: 0 0% 4%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 30 20% 90%;
-    --secondary-foreground: 200 20% 12%;
+    --secondary: 0 0% 94%;
+    --secondary-foreground: 0 0% 4%;
 
-    --muted: 30 15% 94%;
-    --muted-foreground: 200 10% 40%;
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 24 85% 55%;
+    --accent: 0 84% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 30 15% 88%;
-    --input: 30 15% 88%;
-    --ring: 24 85% 55%;
+    --border: 0 0% 0%;
+    --input: 0 0% 90%;
+    --ring: 0 84% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0;
 
-    /* Brand tokens (hex, set dynamically via BrandSettings). */
-    --brand-primary: #1a202c;
-    --brand-secondary: #0e7490;
-    --brand-accent: #e8722a;
-    --brand-bg: #faf8f4;
-    --brand-text: #1a202c;
+    /* Bauhaus brand tokens (hex, set dynamically via BrandSettings). */
+    --brand-primary: #0a0a0a;
+    --brand-secondary: #005fa8;
+    --brand-accent: #e10600;
+    --brand-yellow: #ffd500;
+    --brand-bg: #ffffff;
+    --brand-text: #0a0a0a;
 
-    --font-heading: "Inter", system-ui, sans-serif;
-    --font-body: "Inter", system-ui, sans-serif;
+    --font-heading: var(--font-heading), "Space Grotesk", system-ui, sans-serif;
+    --font-body: var(--font-body), "Inter", system-ui, sans-serif;
   }
 
   * {
@@ -62,12 +63,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading font-semibold tracking-tight;
-  }
-
-  /* Respect RTL: use logical properties throughout components. */
-  [dir="rtl"] {
-    text-align: right;
+    @apply font-heading font-bold tracking-tight;
   }
 }
 
@@ -89,7 +85,7 @@
   }
 
   .prose-richtext :where(h2, h3) {
-    @apply mb-3 mt-6 font-heading font-semibold text-foreground;
+    @apply mb-3 mt-6 font-heading font-bold text-foreground;
   }
 
   .prose-richtext :where(ul, ol) {
@@ -107,4 +103,42 @@
   .prose-richtext :where(a) {
     @apply text-accent underline underline-offset-4;
   }
+
+  /* Bauhaus geometric motif utility */
+  .geo-divider {
+    @apply flex items-center gap-2 py-4;
+  }
+  .geo-divider::before,
+  .geo-divider::after {
+    content: "";
+    @apply h-2 flex-1;
+  }
+  .geo-divider::before {
+    background: var(--brand-accent);
+  }
+  .geo-divider::after {
+    background: var(--brand-secondary);
+  }
+
+  /* River fallback shimmer */
+  .flow-shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--brand-secondary) 0%,
+      var(--brand-accent) 50%,
+      var(--brand-secondary) 100%
+    );
+    background-size: 200% 100%;
+    animation: flow 6s ease-in-out infinite;
+  }
+}
+
+@keyframes flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes ripple {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(3); opacity: 0; }
 }
