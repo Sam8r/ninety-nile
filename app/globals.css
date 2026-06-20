@@ -242,3 +242,10 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Header theme: white logos/nav when transparent over dark hero (e.g. About) */
+header[data-scrolled="false"][data-over-dark="true"] .logo-set-dark { display: none !important; }
+header[data-scrolled="false"][data-over-dark="true"] .logo-set-light { display: flex !important; }
+header[data-scrolled="false"][data-over-dark="true"] .nav-link { color: #fff; }
+header[data-scrolled="true"] .logo-set-dark { display: flex !important; }
+header[data-scrolled="true"] .logo-set-light { display: none !important; }

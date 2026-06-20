@@ -17,7 +17,7 @@ export function SiteNav({ items }: { items: readonly NavItem[] }) {
           <Link
             key={item.href}
             href={item.href}
-            className="text-[0.8125rem] font-medium uppercase tracking-[0.07em] text-[var(--color-ink)] underline-offset-[6px] decoration-1 transition-opacity duration-200 ease-out hover:underline"
+            className="nav-link text-[0.8125rem] font-medium uppercase tracking-[0.07em] text-[var(--color-ink)] underline-offset-[6px] decoration-1 transition-opacity duration-200 ease-out hover:underline"
           >
             {item.label}
           </Link>

@@ -11,7 +11,7 @@ export default async function ServicesPage() {
     <div className="animate-fade-in">
       <section className="relative isolate flex min-h-svh items-end overflow-hidden">
         <Image
-          src="/uploads/curated/page-services.jpg"
+          src="/uploads/curated/page-services-2.jpg"
           alt="Our services"
           fill
           priority
