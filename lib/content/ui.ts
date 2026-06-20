@@ -84,6 +84,7 @@ export const ui = {
 export type Ui = typeof ui;
 
 export const navItems: ReadonlyArray<{ readonly href: string; readonly label: string }> = [
+  { href: "/", label: ui.nav.home },
   { href: "/about", label: ui.nav.about },
   { href: "/services", label: ui.nav.services },
   { href: "/work", label: ui.nav.work },
