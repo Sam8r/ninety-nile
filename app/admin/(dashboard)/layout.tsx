@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   LayoutDashboard,
   Film,
@@ -45,6 +46,28 @@ const NAV: ReadonlyArray<NavEntry> = [
   { href: "/admin/users", label: ui.admin.navUsers, icon: UserCog, adminOnly: true },
 ];
 
+function AdminLogo() {
+  return (
+    <Link href="/admin" className="flex items-center gap-1.5">
+      <Image
+        src="/brand/ninetynile-black.png"
+        alt="NinetyNile"
+        width={90}
+        height={36}
+        className="h-7 w-auto object-contain"
+      />
+      <span className="text-muted-foreground/40">|</span>
+      <Image
+        src="/brand/mastaba-black.png"
+        alt="Mastaba"
+        width={36}
+        height={15}
+        className="h-4 w-auto object-contain"
+      />
+    </Link>
+  );
+}
+
 export default async function AdminLayout({
   children,
 }: {
@@ -57,9 +80,7 @@ export default async function AdminLayout({
       <div className="flex">
         <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-e bg-card lg:flex">
           <div className="flex h-16 items-center border-b px-6">
-            <Link href="/admin" className="font-heading text-lg font-bold">
-              NinetyNile
-            </Link>
+            <AdminLogo />
           </div>
           <nav className="flex-1 space-y-1 overflow-y-auto p-3">
             {NAV.filter((entry) => !entry.adminOnly || user.role === "ADMIN").map((entry) => {
@@ -90,9 +111,7 @@ export default async function AdminLayout({
 
         <div className="flex min-h-dvh flex-1 flex-col">
           <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-card/80 px-4 backdrop-blur lg:hidden">
-            <Link href="/admin" className="font-heading text-base font-bold">
-              NinetyNile
-            </Link>
+            <AdminLogo />
             <SignOutButton label={ui.admin.signOut} compact />
           </header>
           <main className="flex-1 p-4 lg:p-8">{children}</main>

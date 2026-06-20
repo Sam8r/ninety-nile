@@ -6,8 +6,8 @@ import { prisma } from "@/lib/db";
 import { sanitizeRichText } from "@/lib/validation";
 import { ui } from "@/lib/content/ui";
 import { MediaFigure } from "@/components/site/media-figure";
+import { GalleryCarousel } from "@/components/site/gallery-carousel";
 import { ExternalVideoEmbed } from "@/components/site/external-video-embed";
-import { Badge } from "@/components/ui/badge";
 import { ArrowLeft } from "lucide-react";
 
 type Metric = { labelEn?: string; value?: string };
@@ -67,29 +67,29 @@ export default async function CaseStudyDetailPage({
 
   return (
     <article className="animate-fade-in">
-      <header className="border-b-2 border-black bg-secondary/20">
-        <div className="container-wide max-w-4xl py-12 md:py-16">
+      <header className="border-b border-[var(--color-rule)]">
+        <div className="container-wide max-w-4xl pb-2xl pt-[6rem] md:pb-3xl md:pt-[8.5rem]">
           <Link
             href="/work"
-            className="mb-6 inline-flex items-center gap-1 text-sm font-semibold text-muted-foreground hover:text-foreground"
+            className="mb-lg inline-flex items-center gap-1 text-sm font-medium text-[var(--color-muted)] transition-colors hover:text-[var(--color-ink)]"
           >
             <ArrowLeft className="size-4" />
             {ui.work.backToWork}
           </Link>
-          <Badge variant="accent" className="mb-3 uppercase">
+          <p className="mb-xs text-xs uppercase tracking-[0.1em] text-[var(--color-muted)]">
             {study.category.replace(/_/g, " ").toLowerCase()}
-          </Badge>
-          <h1 className="font-heading text-3xl font-bold tracking-tight md:text-5xl">
+          </p>
+          <h1 className="display-text text-display-s">
             {study.titleEn}
           </h1>
           {study.clientEn && (
-            <p className="mt-3 text-lg font-semibold text-accent">{study.clientEn}</p>
+            <p className="mt-md text-lg font-medium text-[var(--color-accent)]">{study.clientEn}</p>
           )}
         </div>
       </header>
 
       {study.heroMedia && (
-        <section className="container-wide max-w-5xl py-8">
+        <section className="container-wide max-w-5xl py-xl">
           <MediaFigure
             path={study.heroMedia.path}
             altEn={study.heroMedia.altEn}
@@ -99,10 +99,10 @@ export default async function CaseStudyDetailPage({
         </section>
       )}
 
-      <div className="container-wide max-w-3xl space-y-12 py-12">
+      <div className="container-wide max-w-3xl space-y-2xl py-2xl">
         {study.challengeEn && (
           <section>
-            <h2 className="mb-4 font-heading text-xl font-bold">{ui.work.theChallenge}</h2>
+            <h2 className="mb-md font-display text-xl font-bold">{ui.work.theChallenge}</h2>
             <div
               className="prose-richtext"
               dangerouslySetInnerHTML={{ __html: sanitizeRichText(study.challengeEn) }}
@@ -112,7 +112,7 @@ export default async function CaseStudyDetailPage({
 
         {study.solutionEn && (
           <section>
-            <h2 className="mb-4 font-heading text-xl font-bold">{ui.work.theSolution}</h2>
+            <h2 className="mb-md font-display text-xl font-bold">{ui.work.theSolution}</h2>
             <div
               className="prose-richtext"
               dangerouslySetInnerHTML={{ __html: sanitizeRichText(study.solutionEn) }}
@@ -122,7 +122,7 @@ export default async function CaseStudyDetailPage({
 
         {(study.resultsEn || metrics.length > 0) && (
           <section>
-            <h2 className="mb-4 font-heading text-xl font-bold">{ui.work.theResults}</h2>
+            <h2 className="mb-md font-display text-xl font-bold">{ui.work.theResults}</h2>
             {study.resultsEn && (
               <div
                 className="prose-richtext"
@@ -130,11 +130,13 @@ export default async function CaseStudyDetailPage({
               />
             )}
             {metrics.length > 0 && (
-              <dl className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
+              <dl className="mt-xl grid grid-cols-2 gap-md sm:grid-cols-3">
                 {metrics.map((m, i) => (
-                  <div key={i} className="border-2 border-black bg-card p-4 text-center">
-                    <dd className="font-heading text-3xl font-bold text-accent">{m.value}</dd>
-                    <dt className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
+                  <div key={i} className="border-t border-[var(--color-rule)] pt-md">
+                    <dd className="font-display text-3xl font-bold text-[var(--color-accent)]">
+                      {m.value}
+                    </dd>
+                    <dt className="mt-2xs text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">
                       {m.labelEn ?? ""}
                     </dt>
                   </div>
@@ -148,20 +150,61 @@ export default async function CaseStudyDetailPage({
           <ExternalVideoEmbed links={study.externalLinks as never} />
         </section>
 
-        {study.galleryItems.length > 0 && (
-          <section>
-            <h2 className="mb-4 font-heading text-xl font-bold">Gallery</h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {study.galleryItems.map((item) => (
-                <MediaFigure
-                  key={item.id}
-                  path={item.media.path}
-                  altEn={item.media.altEn}
-                />
-              ))}
-            </div>
-          </section>
-        )}
+        {study.galleryItems.length > 0 && (() => {
+          type GalleryItem = (typeof study.galleryItems)[number];
+          const PHASES = ["before", "process", "after"];
+          const groups: { label: string; items: GalleryItem[] }[] = [];
+          const fallback: GalleryItem[] = [];
+
+          for (const item of study.galleryItems) {
+            const alt = (item.media.altEn ?? "").toLowerCase();
+            const phase = PHASES.find((p) => alt.startsWith(p));
+            if (phase) {
+              let g = groups.find((g) => g.label.toLowerCase() === phase);
+              if (!g) {
+                g = { label: phase.charAt(0).toUpperCase() + phase.slice(1), items: [] };
+                groups.push(g);
+              }
+              g.items.push(item);
+            } else {
+              fallback.push(item);
+            }
+          }
+
+          const hasPhases = groups.length > 0;
+
+          if (hasPhases) {
+            const slides = groups.map((g) => ({
+              label: g.label,
+              images: g.items.map((item) => ({
+                id: item.id,
+                path: item.media.path,
+                altEn: item.media.altEn ?? "",
+              })),
+            }));
+            return (
+              <section>
+                <h2 className="mb-lg font-display text-xl font-bold">Gallery</h2>
+                <GalleryCarousel slides={slides} />
+              </section>
+            );
+          }
+
+          return (
+            <section>
+              <h2 className="mb-md font-display text-xl font-bold">Gallery</h2>
+              <div className="grid gap-md sm:grid-cols-2">
+                {(fallback.length > 0 ? fallback : study.galleryItems as GalleryItem[]).map((item) => (
+                  <MediaFigure
+                    key={item.id}
+                    path={item.media.path}
+                    altEn={item.media.altEn}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        })()}
       </div>
     </article>
   );

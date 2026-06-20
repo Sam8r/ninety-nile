@@ -28,6 +28,7 @@ export const contactDetailsSchema = z.object({
   website: z.string().max(200).optional().default(""),
   instagram: z.string().max(200).optional().default(""),
   tiktok: z.string().max(200).optional().default(""),
+  twitter: z.string().max(200).optional().default(""),
   addressesEn: z.array(z.string().max(200)).default([]),
   addressesAr: z.array(z.string().max(200)).default([]),
 });

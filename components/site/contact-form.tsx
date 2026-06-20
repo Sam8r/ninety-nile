@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { ui } from "@/lib/content/ui";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,22 +43,21 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      {/* Honeypot — hidden from users, catches bots */}
+    <form onSubmit={onSubmit} className="space-y-md">
       <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
         <label htmlFor="hp">Leave this empty</label>
         <Input id="hp" name="hp" type="text" tabIndex={-1} autoComplete="off" />
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2xs">
         <Label htmlFor="name">{ui.contact.name}</Label>
         <Input id="name" name="name" required maxLength={120} placeholder={ui.contact.namePlaceholder} />
       </div>
-      <div className="space-y-2">
+      <div className="space-y-2xs">
         <Label htmlFor="email">{ui.contact.email}</Label>
         <Input id="email" name="email" type="email" required maxLength={200} placeholder={ui.contact.emailPlaceholder} />
       </div>
-      <div className="space-y-2">
+      <div className="space-y-2xs">
         <Label htmlFor="message">{ui.contact.message}</Label>
         <Textarea id="message" name="message" required maxLength={5000} rows={5} placeholder={ui.contact.messagePlaceholder} />
       </div>
@@ -69,17 +67,21 @@ export function ContactForm() {
           role="status"
           className={
             result.ok
-              ? "text-sm font-medium text-accent"
-              : "text-sm font-medium text-destructive"
+              ? "text-sm font-medium text-[var(--color-accent)]"
+              : "text-sm font-medium text-[var(--color-destructive)]"
           }
         >
           {result.message}
         </p>
       )}
 
-      <Button type="submit" variant="accent" disabled={isPending}>
+      <button
+        type="submit"
+        disabled={isPending}
+        className="inline-flex h-12 items-center bg-[var(--color-accent)] px-lg text-base font-semibold text-[var(--color-paper)] transition-opacity duration-200 ease-out hover:opacity-90 disabled:opacity-50"
+      >
         {isPending ? ui.contact.sending : ui.contact.send}
-      </Button>
+      </button>
     </form>
   );
 }

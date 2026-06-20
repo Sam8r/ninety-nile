@@ -315,6 +315,7 @@ model ContactDetails {
   website     String? @db.VarChar(200)
   instagram   String? @db.VarChar(200)
   tiktok      String? @db.VarChar(200)
+  twitter     String? @db.VarChar(200)
   addressesEn Json?
   addressesAr Json?
   updatedAt   DateTime @updatedAt

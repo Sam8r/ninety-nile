@@ -11,18 +11,13 @@ export function PageHeader({
   className?: string;
 }) {
   return (
-    <section
-      className={cn(
-        "border-b-2 border-black bg-white",
-        className,
-      )}
-    >
-      <div className="container-wide py-16 md:py-24">
-        <h1 className="font-heading text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl">
+    <section className={cn("border-b border-[var(--color-rule)]", className)}>
+      <div className="container-wide pb-xl pt-[6rem] md:pb-2xl md:pt-[8.5rem]">
+        <h1 className="text-balance font-display text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
           {title}
         </h1>
         {subtitle && (
-          <p className="mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
+          <p className="mt-lg max-w-2xl text-pretty text-lg leading-relaxed text-[var(--color-muted)] md:text-xl">
             {subtitle}
           </p>
         )}

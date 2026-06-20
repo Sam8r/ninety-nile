@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { pageMetadata } from "@/lib/page-metadata";
 import { PageHeader } from "@/components/site/page-header";
+import { TestimonialsCarousel } from "@/components/site/testimonials-carousel";
 
 export const generateMetadata = pageMetadata("clients");
 
@@ -15,57 +16,47 @@ export default async function ClientsPage() {
       <PageHeader title="Clients & Testimonials" />
 
       {testimonials.length > 0 && (
-        <section className="border-b-2 border-black bg-secondary/20 py-16">
-          <div className="container-wide">
-            <div className="grid gap-6 md:grid-cols-2">
-              {testimonials.map((t) => (
-                <figure
-                  key={t.id}
-                  className="border-2 border-black bg-card p-6"
-                >
-                  <blockquote className="text-lg italic leading-relaxed text-foreground">
-                    &ldquo;{t.quoteEn}&rdquo;
-                  </blockquote>
-                  <figcaption className="mt-4">
-                    <p className="font-semibold">{t.authorName}</p>
-                    {t.authorRoleEn && (
-                      <p className="text-sm text-muted-foreground">
-                        {t.authorRoleEn}
-                        {t.org ? ` \u00b7 ${t.org}` : ""}
-                      </p>
-                    )}
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
+        <section className="border-b border-[var(--color-rule)] bg-[var(--color-paper-2)]">
+          <div className="container-wide py-3xl md:py-3xl">
+            <p className="mb-xl text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-muted)]">
+              What they say
+            </p>
+            <TestimonialsCarousel items={testimonials} />
           </div>
         </section>
       )}
 
-      <section className="container-wide py-16">
-        <h2 className="mb-8 text-center font-heading text-2xl font-bold md:text-3xl">
+      <section className="container-wide pt-3xl pb-3xl">
+        <h2 className="mb-xl text-balance font-display text-2xl font-bold md:text-3xl">
           Our Clients
         </h2>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {clients.map((client) => (
-            <div
-              key={client.id}
-              className="flex items-center justify-center border-2 border-black bg-card p-6 text-center"
-            >
-              {client.logo ? (
-                <img
-                  src={`/uploads/${client.logo.path}`}
-                  alt={client.name}
-                  className="max-h-16 max-w-full object-contain"
-                />
-              ) : (
-                <span className="font-heading font-semibold text-muted-foreground">
-                  {client.name}
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
+        <ul className="grid grid-cols-2 gap-px border border-[var(--color-rule)] bg-[var(--color-rule)] sm:grid-cols-3 lg:grid-cols-4">
+          {clients.map((client) => {
+            const logo = client.logo
+              ? { src: `/uploads/${client.logo.path}`, alt: client.name }
+              : null;
+            return (
+              <li
+                key={client.id}
+                className="flex min-h-[7rem] items-center justify-center bg-[var(--color-paper)] p-lg"
+              >
+                {logo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={logo.src}
+                    alt={logo.alt}
+                    title={client.name}
+                    className="max-h-12 max-w-[80%] object-contain opacity-70 grayscale transition duration-200 ease-out hover:opacity-100 hover:grayscale-0"
+                  />
+                ) : (
+                  <span className="text-pretty text-center font-display text-sm font-bold text-[var(--color-muted)]">
+                    {client.name}
+                  </span>
+                )}
+              </li>
+            );
+          })}
+        </ul>
       </section>
     </div>
   );

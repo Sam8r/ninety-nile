@@ -15,23 +15,23 @@ export type BrandTokens = {
   fontBody: string;
 };
 
-/** Bauhaus defaults — black/white base with red/blue/yellow accents. */
+/** Bauhaus Editorial defaults — OKLCH tokens per design.md. */
 const FALLBACK: BrandTokens = {
   siteNameEn: "NinetyNile",
   taglineEn: "Creativity, Overflowing.",
   secondaryTaglineEn:
     "A boutique creative communication consultancy and content creation agency — rooted in Sudan, working across the globe.",
-  colorPrimary: "#0a0a0a",
-  colorSecondary: "#005fa8",
-  colorAccent: "#e10600",
-  colorBg: "#ffffff",
-  colorText: "#0a0a0a",
+  colorPrimary: "oklch(18% 0 0)",
+  colorSecondary: "oklch(55% 0 0)",
+  colorAccent: "oklch(18% 0 0)",
+  colorBg: "oklch(98% 0 0)",
+  colorText: "oklch(18% 0 0)",
   fontHeading: "Space Grotesk",
   fontBody: "Inter",
 };
 
 /** Bauhaus yellow is a design-system constant (not yet admin-configurable). */
-const BAUHAUS_YELLOW = "#ffd500";
+const BAUHAUS_YELLOW = "oklch(80% 0 0)";
 
 export function brandToCssVars(
   brand: Pick<

@@ -1,31 +1,33 @@
 import "server-only";
 import Link from "next/link";
 import Image from "next/image";
-import { getBrandTokens } from "@/lib/branding";
 import { navItems } from "@/lib/content/ui";
 import { SiteNav } from "@/components/site/site-nav";
+import { HeaderShell } from "@/components/site/header-shell";
 
 export async function SiteHeader() {
-  const brand = await getBrandTokens();
-
   return (
-    <header className="sticky top-0 z-50 w-full border-b-2 border-black bg-white/90 backdrop-blur-md">
-      <div className="container-wide flex h-16 items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-2">
-          <Image
-            src="/brand/logo-mark.png"
-            alt={brand.siteNameEn}
-            width={32}
-            height={32}
-            className="size-8 object-contain"
-          />
-          <span className="font-heading text-lg font-bold tracking-tight">
-            {brand.siteNameEn}
-          </span>
-        </Link>
-
-        <SiteNav items={navItems} />
-      </div>
-    </header>
+    <HeaderShell>
+      <Link href="/" className="flex items-center gap-sm" aria-label="NinetyNile — Mastaba home">
+        <Image
+          src="/brand/ninetynile-black.png"
+          alt="NinetyNile"
+          width={160}
+          height={65}
+          className="h-11 w-auto object-contain"
+          priority
+        />
+        <span className="text-lg text-[var(--color-muted)]/40">|</span>
+        <Image
+          src="/brand/mastaba-black.png"
+          alt="Mastaba"
+          width={64}
+          height={27}
+          className="h-7 w-auto object-contain"
+          priority
+        />
+      </Link>
+      <SiteNav items={navItems} />
+    </HeaderShell>
   );
 }

@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { CaseStudy } from "@prisma/client";
-import { Badge } from "@/components/ui/badge";
 import { ArrowUpRight } from "lucide-react";
 
 type CardStudy = {
@@ -22,35 +21,39 @@ export function CaseStudyCard({ study }: { study: CardStudy }) {
   return (
     <Link
       href={`/work/${study.slug}`}
-      className="group flex flex-col overflow-hidden border-2 border-black bg-white transition-shadow hover:shadow-[8px_8px_0_0_#000]"
+      className="group flex flex-col border-t border-[var(--color-rule)] pt-md transition-colors duration-200 ease-out hover:border-[var(--color-accent)]"
     >
-      <div className="relative aspect-video overflow-hidden bg-muted">
+      <div className="relative aspect-[4/3] overflow-hidden bg-[var(--color-paper-2)]">
         {study.heroMedia ? (
           <Image
             src={`/uploads/${study.heroMedia.path}`}
             alt={alt || title}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-secondary">
-            <span className="font-heading text-6xl font-bold text-black/10">
+          <div className="flex h-full w-full items-center justify-center">
+            <span className="font-display text-7xl font-bold text-[var(--color-rule)]">
               {title.charAt(0)}
             </span>
           </div>
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-2 p-5">
-        <div className="flex items-center justify-between gap-2">
-          <Badge variant="secondary" className="uppercase tracking-wide">
+      <div className="flex flex-1 flex-col gap-2xs pt-md">
+        <div className="flex items-center justify-between">
+          <span className="text-xs uppercase tracking-[0.1em] text-[var(--color-muted)]">
             {study.category.replace(/_/g, " ").toLowerCase()}
-          </Badge>
-          <ArrowUpRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </span>
+          <ArrowUpRight className="size-4 text-[var(--color-muted)] transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </div>
-        <h3 className="font-heading text-lg font-bold leading-tight">{title}</h3>
-        {client && <p className="text-sm font-semibold text-accent">{client}</p>}
-        {summary && <p className="line-clamp-2 text-sm text-muted-foreground">{summary}</p>}
+        <h3 className="font-display text-xl font-bold leading-tight">{title}</h3>
+        {client && (
+          <p className="text-sm font-medium text-[var(--color-accent)]">{client}</p>
+        )}
+        {summary && (
+          <p className="line-clamp-2 text-sm text-[var(--color-muted)]">{summary}</p>
+        )}
       </div>
     </Link>
   );

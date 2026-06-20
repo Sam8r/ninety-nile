@@ -18,6 +18,7 @@ export function ContactDetailsForm({ initial }: { initial: ContactDetails | null
     website: initial?.website ?? "",
     instagram: initial?.instagram ?? "",
     tiktok: initial?.tiktok ?? "",
+    twitter: initial?.twitter ?? "",
     addressesEn: ((initial?.addressesEn as string[]) ?? []).join("\n"),
   });
 
@@ -58,9 +59,15 @@ export function ContactDetailsForm({ initial }: { initial: ContactDetails | null
           <Input value={form.instagram} onChange={(e) => set("instagram", e.target.value)} className="mt-1" />
         </div>
       </div>
-      <div>
-        <Label>TikTok URL</Label>
-        <Input value={form.tiktok} onChange={(e) => set("tiktok", e.target.value)} className="mt-1" />
+      <div className="grid gap-3 md:grid-cols-2">
+        <div>
+          <Label>TikTok URL</Label>
+          <Input value={form.tiktok} onChange={(e) => set("tiktok", e.target.value)} className="mt-1" />
+        </div>
+        <div>
+          <Label>Twitter / X URL</Label>
+          <Input value={form.twitter} onChange={(e) => set("twitter", e.target.value)} className="mt-1" />
+        </div>
       </div>
       <div>
         <Label>Addresses (one per line)</Label>

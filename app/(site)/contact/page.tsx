@@ -17,44 +17,50 @@ export default async function ContactPage() {
     <div className="animate-fade-in">
       <PageHeader title={ui.contact.title} subtitle={ui.contact.subtitle} />
 
-      <section className="container-wide grid gap-12 py-16 md:grid-cols-2">
+      <section className="container-wide grid gap-2xl py-3xl md:grid-cols-2">
         <div>
           <ContactForm />
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-lg">
           {contact?.email && (
-            <div>
-              <h3 className="font-heading text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            <div className="border-t border-[var(--color-rule)] pt-md">
+              <p className="text-xs uppercase tracking-[0.1em] text-[var(--color-muted)]">
                 {ui.contact.emailLabel}
-              </h3>
-              <a href={`mailto:${contact.email}`} className="text-lg hover:underline">
+              </p>
+              <a
+                href={`mailto:${contact.email}`}
+                className="mt-xs block text-lg transition-colors hover:text-[var(--color-accent)]"
+              >
                 {contact.email}
               </a>
             </div>
           )}
           {contact?.phone && (
-            <div>
-              <h3 className="font-heading text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            <div className="border-t border-[var(--color-rule)] pt-md">
+              <p className="text-xs uppercase tracking-[0.1em] text-[var(--color-muted)]">
                 {ui.contact.phone}
-              </h3>
-              <a href={`tel:${contact.phone}`} className="text-lg hover:underline">
+              </p>
+              <a
+                href={`tel:${contact.phone}`}
+                className="mt-xs block text-lg transition-colors hover:text-[var(--color-accent)]"
+              >
                 {contact.phone}
               </a>
             </div>
           )}
-          {(contact?.instagram || contact?.tiktok) && (
-            <div>
-              <h3 className="font-heading text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          {(contact?.instagram || contact?.tiktok || contact?.twitter) && (
+            <div className="border-t border-[var(--color-rule)] pt-md">
+              <p className="text-xs uppercase tracking-[0.1em] text-[var(--color-muted)]">
                 Social
-              </h3>
-              <div className="flex flex-wrap gap-3">
+              </p>
+              <div className="mt-xs flex flex-wrap gap-md">
                 {contact?.instagram && (
                   <a
                     href={contact.instagram}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-accent hover:underline"
+                    className="text-lg text-[var(--color-accent)] underline underline-offset-4"
                   >
                     {ui.contact.instagram}
                   </a>
@@ -64,22 +70,32 @@ export default async function ContactPage() {
                     href={contact.tiktok}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-accent hover:underline"
+                    className="text-lg text-[var(--color-accent)] underline underline-offset-4"
                   >
                     {ui.contact.tiktok}
+                  </a>
+                )}
+                {contact?.twitter && (
+                  <a
+                    href={contact.twitter}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-lg text-[var(--color-accent)] underline underline-offset-4"
+                  >
+                    Twitter / X
                   </a>
                 )}
               </div>
             </div>
           )}
           {addresses.length > 0 && (
-            <div>
-              <h3 className="font-heading text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            <div className="border-t border-[var(--color-rule)] pt-md">
+              <p className="text-xs uppercase tracking-[0.1em] text-[var(--color-muted)]">
                 Locations
-              </h3>
-              <ul className="space-y-1">
+              </p>
+              <ul className="mt-xs space-y-2xs">
                 {addresses.map((addr, i) => (
-                  <li key={i}>{addr}</li>
+                  <li key={i} className="text-lg">{addr}</li>
                 ))}
               </ul>
             </div>

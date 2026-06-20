@@ -1,132 +1,218 @@
+/* Hallmark · genre: editorial · macrostructure: multi (Marquee Hero / Portfolio Grid / Long Document / Narrative Workflow / Workbench) · design-system: design.md · designed-as-app */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Bauhaus palette — white on black with primary red/blue/yellow accents.
-       Overridden at runtime by BrandSettings CSS vars. */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 4%;
+    --color-paper:      oklch(98% 0.004 250);
+    --color-paper-2:    oklch(95% 0.006 250);
+    --color-rule:       oklch(85% 0.005 250);
+    --color-neutral:    oklch(55% 0.005 250);
+    --color-muted:      oklch(42% 0.005 250);
+    --color-ink:        oklch(18% 0.008 250);
+    --color-ink-2:      oklch(30% 0.006 250);
+    /* Black & white palette: "accent" resolves to ink so every accent
+       button/highlight renders black; secondary tones are neutral grays. */
+    --color-accent:     oklch(18% 0 0);
+    --color-accent-2:   oklch(55% 0 0);
+    --color-yellow:     oklch(80% 0 0);
+    --color-focus:      oklch(30% 0 0);
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 4%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 4%;
-
-    --primary: 0 0% 4%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 0 0% 94%;
-    --secondary-foreground: 0 0% 4%;
-
-    --muted: 0 0% 94%;
-    --muted-foreground: 0 0% 40%;
-
-    --accent: 0 84% 50%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 0 0% 0%;
-    --input: 0 0% 90%;
-    --ring: 0 84% 50%;
-
+    --background: var(--color-paper);
+    --foreground: var(--color-ink);
+    --card: var(--color-paper);
+    --card-foreground: var(--color-ink);
+    --popover: var(--color-paper);
+    --popover-foreground: var(--color-ink);
+    --primary: var(--color-ink);
+    --primary-foreground: var(--color-paper);
+    --secondary: var(--color-paper-2);
+    --secondary-foreground: var(--color-ink);
+    --muted: var(--color-paper-2);
+    --muted-foreground: var(--color-muted);
+    --accent: var(--color-accent);
+    --accent-foreground: var(--color-paper);
+    --destructive: var(--color-accent);
+    --destructive-foreground: var(--color-paper);
+    --border: var(--color-rule);
+    --input: var(--color-rule);
+    --ring: var(--color-focus);
     --radius: 0;
 
-    /* Bauhaus brand tokens (hex, set dynamically via BrandSettings). */
-    --brand-primary: #0a0a0a;
-    --brand-secondary: #005fa8;
-    --brand-accent: #e10600;
-    --brand-yellow: #ffd500;
-    --brand-bg: #ffffff;
-    --brand-text: #0a0a0a;
+    --space-3xs: 0.25rem;  --space-2xs: 0.5rem;  --space-xs: 0.75rem;
+    --space-sm:  1rem;     --space-md:  1.5rem;  --space-lg: 2rem;
+    --space-xl:  3rem;     --space-2xl: 4.5rem;  --space-3xl: 7rem;
 
-    --font-heading: var(--font-heading), "Space Grotesk", system-ui, sans-serif;
-    --font-body: var(--font-body), "Inter", system-ui, sans-serif;
+    --text-xs: 0.75rem;  --text-sm: 0.875rem; --text-md: 1.125rem;
+    --text-lg: 1.375rem; --text-xl: 1.75rem;  --text-2xl: 2.25rem;
+    --text-3xl: 3rem;    --text-4xl: 3.75rem;
+    --text-display: clamp(2.75rem, 6vw + 1rem, 5.5rem);
+    --text-display-s: clamp(2rem, 4vw + 0.5rem, 3.5rem);
+
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in:  cubic-bezier(0.7, 0, 0.84, 0);
+    --dur-short: 220ms;
+    --dur-med:   300ms;
+
+    --rule-hair: 1px;
+    --rule-thick: 3px;
+    --page-gutter: clamp(1rem, 4vw, 1.5rem);
+    --measure: 65ch;
+
+    --brand-primary: oklch(18% 0 0);
+    --brand-secondary: oklch(55% 0 0);
+    --brand-accent: oklch(18% 0 0);
+    --brand-yellow: oklch(80% 0 0);
+    --brand-bg: oklch(98% 0 0);
+    --brand-text: oklch(18% 0 0);
   }
 
   * {
-    @apply border-border;
+    border-color: var(--color-rule);
   }
 
   html {
     scroll-behavior: smooth;
+    overflow-x: clip;
   }
 
   body {
-    @apply bg-background text-foreground font-body antialiased;
-    background-color: var(--brand-bg);
-    color: var(--brand-text);
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading font-bold tracking-tight;
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.0;
+    font-style: normal;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
   }
 }
 
 @layer utilities {
   .container-prose {
-    @apply mx-auto max-w-3xl px-6;
+    max-width: var(--measure);
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
   }
 
   .container-wide {
-    @apply mx-auto max-w-7xl px-6;
+    max-width: 84rem;
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
+  }
+
+  .container-bleed {
+    max-width: 100%;
+    padding-inline: var(--page-gutter);
   }
 
   .prose-richtext {
-    @apply leading-relaxed text-muted-foreground;
+    line-height: 1.65;
+    color: var(--color-ink-2);
   }
 
   .prose-richtext :where(p) {
-    @apply mb-4;
+    margin-bottom: var(--space-md);
   }
 
   .prose-richtext :where(h2, h3) {
-    @apply mb-3 mt-6 font-heading font-bold text-foreground;
+    margin-bottom: var(--space-sm);
+    margin-top: var(--space-xl);
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--color-ink);
+    line-height: 1.1;
   }
 
   .prose-richtext :where(ul, ol) {
-    @apply mb-4 ps-6;
+    margin-bottom: var(--space-md);
+    padding-inline-start: var(--space-lg);
   }
 
   .prose-richtext :where(ul) {
-    @apply list-disc;
+    list-style: disc;
   }
 
   .prose-richtext :where(ol) {
-    @apply list-decimal;
+    list-style: decimal;
   }
 
   .prose-richtext :where(a) {
-    @apply text-accent underline underline-offset-4;
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
-  /* Bauhaus geometric motif utility */
-  .geo-divider {
-    @apply flex items-center gap-2 py-4;
-  }
-  .geo-divider::before,
-  .geo-divider::after {
-    content: "";
-    @apply h-2 flex-1;
-  }
-  .geo-divider::before {
-    background: var(--brand-accent);
-  }
-  .geo-divider::after {
-    background: var(--brand-secondary);
+  .prose-richtext :where(strong) {
+    color: var(--color-ink);
+    font-weight: 600;
   }
 
-  /* River fallback shimmer */
+  .prose-inverted {
+    color: var(--color-paper-2);
+  }
+  .prose-inverted :where(h2, h3) {
+    color: var(--color-paper);
+  }
+  .prose-inverted :where(a) {
+    color: var(--color-paper);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose-inverted :where(strong) {
+    color: var(--color-paper);
+  }
+
+  .display-text {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+  }
+
+  .muted {
+    color: var(--color-muted);
+  }
+
+  .double-rule {
+    border-top: var(--rule-hair) solid var(--color-rule);
+    border-bottom: var(--rule-hair) solid var(--color-rule);
+    padding-block: 2px;
+  }
+
+  .accent-rule {
+    border-top: var(--rule-thick) solid var(--color-accent);
+  }
+
   .flow-shimmer {
     background: linear-gradient(
       90deg,
-      var(--brand-secondary) 0%,
-      var(--brand-accent) 50%,
-      var(--brand-secondary) 100%
+      var(--color-accent-2) 0%,
+      var(--color-accent) 50%,
+      var(--color-accent-2) 100%
     );
     background-size: 200% 100%;
     animation: flow 6s ease-in-out infinite;
@@ -141,4 +227,18 @@
 @keyframes ripple {
   0% { transform: scale(1); opacity: 0.6; }
   100% { transform: scale(3); opacity: 0; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

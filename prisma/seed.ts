@@ -43,11 +43,11 @@ async function main() {
       taglineAr: "الإبداع يفيض.",
       secondaryTaglineEn: "A boutique creative communication consultancy and content creation agency — rooted in Sudan, working across the globe.",
       secondaryTaglineAr: "وكالة استشارات الاتصال الإبداعية وبناء المحتوى",
-      colorPrimary: "#0a0a0a",
-      colorSecondary: "#005fa8",
-      colorAccent: "#e10600",
-      colorBg: "#ffffff",
-      colorText: "#0a0a0a",
+      colorPrimary: "oklch(18% 0 0)",
+      colorSecondary: "oklch(55% 0 0)",
+      colorAccent: "oklch(18% 0 0)",
+      colorBg: "oklch(98% 0 0)",
+      colorText: "oklch(18% 0 0)",
       fontHeading: "Space Grotesk",
       fontBody: "Inter",
     },
@@ -59,11 +59,12 @@ async function main() {
     update: {},
     create: {
       id: "singleton",
-      email: "safa@ninetynile.com",
+      email: "info@ninetynile.com",
       phone: "+44 (0)7956925540",
       website: "ninetynile.com",
       instagram: "https://instagram.com/19NinetyNile",
       tiktok: "https://tiktok.com/@19ninetynile",
+      twitter: "https://twitter.com/19NinetyNile",
       addressesEn: [
         "Port Sudan, Sudan",
         "Nairobi, Kenya",
@@ -144,6 +145,21 @@ async function main() {
       where: { key: sc.key },
       update: {},
       create: sc,
+    });
+  }
+
+  // Link page-level images to SiteContent
+  const pageMediaLinks: Array<{ key: string; file: string; alt: string }> = [
+    { key: "ABOUT_STORY", file: "about-story.jpg", alt: "NinetyNile profile" },
+    { key: "CAUSE_EFFECT", file: "about-cause.jpg", alt: "NinetyNile creative work" },
+    { key: "BRAND_EXPERIENCE", file: "about-brand.jpg", alt: "Brand experience" },
+    { key: "COMMUNITY_ACHIEVEMENT", file: "elqiyada-nights.jpg", alt: "Al Qiyadah Nights — community transformation" },
+  ];
+  for (const link of pageMediaLinks) {
+    const mediaId = await curatedMedia(link.file, link.alt);
+    await prisma.siteContent.updateMany({
+      where: { key: link.key },
+      data: { mediaId },
     });
   }
 
@@ -268,19 +284,42 @@ async function main() {
     },
   });
 
-  // --- Case studies (9) ---------------------------------------------------
+  // --- Case studies ---------------------------------------------------
+  await prisma.caseStudyMedia.deleteMany({});
   await prisma.caseStudy.deleteMany({});
+
+  async function curatedMedia(filename: string, alt: string) {
+    const ext = (filename.split(".").pop() ?? "jpg").toLowerCase();
+    const mime =
+      ext === "png" ? "image/png" :
+      ext === "webp" ? "image/webp" :
+      ext === "gif" ? "image/gif" :
+      "image/jpeg";
+    const relPath = `curated/${filename}`;
+    const existing = await prisma.mediaAsset.findFirst({ where: { path: relPath } });
+    if (existing) return existing.id;
+    const asset = await prisma.mediaAsset.create({
+      data: { filename, path: relPath, mimeType: mime, kind: "IMAGE", altEn: alt, sizeBytes: BigInt(0) },
+    });
+    return asset.id;
+  }
+
+  type GalleryImg = { file: string; alt: string };
 
   type SeedCS = {
     slug: string;
     titleEn: string; titleAr: string;
     clientEn: string; clientAr: string;
     summaryEn: string; summaryAr: string;
-    challengeEn: string; challengeEn_body?: boolean;
+    challengeEn: string;
+    solutionEn?: string;
+    resultsEn?: string;
     category: CaseStudyCategory;
     metrics: Metric[];
     externalLinks: ExternalLink[];
     order: number;
+    heroImage?: string;
+    gallery?: GalleryImg[];
   };
 
   const caseStudies: SeedCS[] = [
@@ -300,6 +339,12 @@ async function main() {
         { label: "Instagram", url: "https://instagram.com/reel/C4YxiVDObqZ" },
       ],
       order: 0,
+      heroImage: "sixty-light-seconds.jpg",
+      gallery: [
+        { file: "sixty-light-seconds-2.jpg", alt: "Sixty Light Seconds — episode still" },
+        { file: "sixty-light-seconds-3.jpg", alt: "Sixty Light Seconds — behind the scenes" },
+        { file: "sixty-light-seconds-4.jpg", alt: "Sixty Light Seconds — guest portrait" },
+      ],
     },
     {
       slug: "cradle-the-earth",
@@ -317,6 +362,7 @@ async function main() {
         { label: "Instagram", url: "https://instagram.com/reel/Ck8eUcHoJKO" },
       ],
       order: 1,
+      heroImage: "cradle-the-earth.jpg",
     },
     {
       slug: "whats-the-sauce-bono",
@@ -331,6 +377,7 @@ async function main() {
         { label: "TikTok", url: "https://tiktok.com/@19ninetynile" },
       ],
       order: 2,
+      heroImage: "whats-the-sauce.jpg",
     },
     {
       slug: "tamam",
@@ -348,6 +395,10 @@ async function main() {
         { label: "YouTube", url: "https://youtube.com/watch?v=IRxFuA2QPg0" },
       ],
       order: 3,
+      heroImage: "tamam.jpg",
+      gallery: [
+        { file: "tamam-bts.jpg", alt: "Tamam — behind the scenes" },
+      ],
     },
     {
       slug: "hodana",
@@ -365,6 +416,7 @@ async function main() {
         { label: "YouTube", url: "https://youtube.com/watch?v=pnEELjKDgog" },
       ],
       order: 4,
+      heroImage: "hodana.jpeg",
     },
     {
       slug: "makhtoum",
@@ -382,6 +434,7 @@ async function main() {
         { label: "YouTube", url: "https://youtube.com/watch?v=hVRN1rKq2v8" },
       ],
       order: 5,
+      heroImage: "makhtoum.jpg",
     },
     {
       slug: "ayaam",
@@ -399,6 +452,7 @@ async function main() {
         { label: "YouTube", url: "https://youtube.com/watch?v=wAohE6VG6-c" },
       ],
       order: 6,
+      heroImage: "ayaam.jpg",
     },
     {
       slug: "digitech-lg-vivace",
@@ -415,6 +469,10 @@ async function main() {
         { label: "YouTube", url: "https://youtube.com/watch?v=-7k8HrT9iMk" },
       ],
       order: 7,
+      heroImage: "vivace-1.jpg",
+      gallery: [
+        { file: "vivace-2.jpg", alt: "LG Vivace — alternate still" },
+      ],
     },
     {
       slug: "salimmik",
@@ -431,33 +489,132 @@ async function main() {
         { label: "YouTube", url: "https://youtube.com/watch?v=JS6nXa5K2so" },
       ],
       order: 8,
+      heroImage: "salimmik.jpg",
+    },
+    {
+      slug: "elqiyada-nights",
+      titleEn: "Al Qiyadah Nights", titleAr: "ليالي القيادة",
+      clientEn: "Community Service", clientAr: "خدمة مجتمعية",
+      summaryEn: "Reclaiming an open-air dump during the 2019 revolution sit-in and transforming it into a celebrated cultural space.",
+      summaryAr: "استعادة مكبّ نفايات مكشوف خلال اعتصام ثورة 2019 وتحويله إلى فضاء ثقافي محتفى به.",
+      challengeEn: "During the HQ sit-in of Sudan's 2019 revolution, an open-air dump occupied what could have been a gathering space for the community. The area was neglected, unsafe, and an eyesore in the heart of Al Qiyadah Square.",
+      solutionEn: "Over six nights, our team and volunteers reclaimed the space — clearing debris, cleaning, painting murals, building stages and seating, and installing lighting. What was once a dump became a vibrant, open-air cultural venue hosting nightly events, music, art, and dialogue.",
+      resultsEn: "The rehabilitated space became Al Qiyadah's most celebrated cultural hub, hosting figures like Alaa Satir, Galal Yousif, Asil Diab, Mohamed Kordofani, Hajooj Kuka, Yousra El Bagir, and Mohammed Mattar. It stood as a testament to the power of community-driven transformation.",
+      category: CaseStudyCategory.CAMPAIGN,
+      metrics: [
+        { labelEn: "Nights of events", labelAr: "ليلة من الفعاليات", value: "6" },
+        { labelEn: "Cultural figures hosted", labelAr: "شخصية ثقافية", value: "7+" },
+      ],
+      externalLinks: [],
+      order: 9,
+      heroImage: "elqiyada-nights.jpg",
+      gallery: [
+        { file: "elqiyada-nights-before.jpg", alt: "Before — the open-air dump" },
+        { file: "elqiyada-nights-process-1.jpg", alt: "Process — clearing debris" },
+        { file: "elqiyada-nights-process-2.jpg", alt: "Process — cleaning the space" },
+        { file: "elqiyada-nights-process-3.jpg", alt: "Process — building structures" },
+        { file: "elqiyada-nights-process-4.jpg", alt: "Process — painting murals" },
+        { file: "elqiyada-nights-process-5.jpg", alt: "Process — installing lighting" },
+        { file: "elqiyada-nights-process-6.jpg", alt: "Process — constructing the stage" },
+        { file: "elqiyada-nights-process-7.jpg", alt: "Process — volunteer teamwork" },
+        { file: "elqiyada-nights-process-8.jpg", alt: "Process — final preparations" },
+        { file: "elqiyada-nights-after-1.jpg", alt: "After — the cultural space in full swing" },
+        { file: "elqiyada-nights-after-2.jpg", alt: "After — events and gatherings" },
+      ],
+    },
+    {
+      slug: "views-from-jabal-marra",
+      titleEn: "Views from Jabal Marra", titleAr: "إطلالات من جبل مرة",
+      clientEn: "Documentary", clientAr: "وثائقي",
+      summaryEn: "A visual journey through the landscapes and communities of the Jabal Marra region.",
+      summaryAr: "رحلة بصرية عبر مناظر ومجتمعات منطقة جبل مرة.",
+      challengeEn: "Document the natural beauty and cultural richness of one of Sudan's most iconic yet underrepresented regions.",
+      category: CaseStudyCategory.DOCUMENTARY,
+      metrics: [],
+      externalLinks: [],
+      order: 10,
+      heroImage: "views-from-jabal-marra.jpg",
+    },
+    {
+      slug: "eid-greeting",
+      titleEn: "Eid Greeting", titleAr: "تهنئة العيد",
+      clientEn: "Greeting Card", clientAr: "بطاقة معايدة",
+      summaryEn: "A festive Eid greeting campaign celebrating Sudanese traditions and community.",
+      summaryAr: "حملة تهنئة عيد احتفاءً بالتقاليد والمجتمع السوداني.",
+      challengeEn: "Create a warm, culturally resonant Eid greeting that feels authentic and shareable.",
+      category: CaseStudyCategory.CAMPAIGN,
+      metrics: [],
+      externalLinks: [],
+      order: 11,
+      heroImage: "eid-greeting.jpg",
+    },
+    {
+      slug: "crc-explained",
+      titleEn: "CRC Explained", titleAr: "شرح اتفاقية حقوق الطفل",
+      clientEn: "UNICEF", clientAr: "اليونيسف",
+      summaryEn: "An explainer breaking down the Convention on the Rights of the Child in simple, visual terms.",
+      summaryAr: "فيديو توضيحي يبسّط اتفاقية حقوق الطفل بمصطلحات بسيطة ومرئية.",
+      challengeEn: "Make a complex legal framework understandable and engaging for children and parents alike.",
+      category: CaseStudyCategory.OTHER,
+      metrics: [],
+      externalLinks: [],
+      order: 12,
+      heroImage: "crc-explained.jpg",
+    },
+    {
+      slug: "malnutrition-explained",
+      titleEn: "Malnutrition Explained", titleAr: "سوء التغذية موضّحًا",
+      clientEn: "UNICEF", clientAr: "اليونيسف",
+      summaryEn: "An educational explainer on the causes, signs, and solutions to child malnutrition.",
+      summaryAr: "فيديو تثقيفي يشرح أسباب وعلامات وحلول سوء التغذية لدى الأطفال.",
+      challengeEn: "Communicate a sensitive health topic clearly and compassionately to diverse audiences.",
+      category: CaseStudyCategory.OTHER,
+      metrics: [],
+      externalLinks: [],
+      order: 13,
+      heroImage: "malnutrition-explained.jpg",
     },
   ];
 
   for (const cs of caseStudies) {
-    const data = {
-      slug: cs.slug,
-      titleEn: cs.titleEn,
-      titleAr: cs.titleAr,
-      clientEn: cs.clientEn,
-      clientAr: cs.clientAr,
-      summaryEn: cs.summaryEn,
-      summaryAr: cs.summaryAr,
-      challengeEn: cs.challengeEn,
-      challengeAr: cs.challengeEn,
-      solutionEn: "Crafted with our end-to-end creative process — from concept development to final delivery.",
-      solutionAr: "صُنع بعمليتنا الإبداعية المتكاملة — من تطوير المفهوم حتى التسليم النهائي.",
-      resultsEn: "The work resonated deeply with audiences and amplified the message far beyond expectations.",
-      resultsAr: "لقي العمل صدى عميقًا لدى الجمهور وضخّم الرسالة إلى أبعد من المتوقع.",
-      category: cs.category,
-      metrics: cs.metrics,
-      externalLinks: cs.externalLinks,
-      order: cs.order,
-      status: Status.PUBLISHED,
-      publishedAt: new Date(),
-      authorId: admin.id,
-    };
-    await prisma.caseStudy.create({ data });
+    const heroMediaId = cs.heroImage
+      ? await curatedMedia(cs.heroImage, cs.titleEn)
+      : undefined;
+
+    const row = await prisma.caseStudy.create({
+      data: {
+        slug: cs.slug,
+        titleEn: cs.titleEn,
+        titleAr: cs.titleAr,
+        clientEn: cs.clientEn,
+        clientAr: cs.clientAr,
+        summaryEn: cs.summaryEn,
+        summaryAr: cs.summaryAr,
+        challengeEn: cs.challengeEn,
+        challengeAr: cs.challengeEn,
+        solutionEn: cs.solutionEn ?? "Crafted with our end-to-end creative process — from concept development to final delivery.",
+        solutionAr: "صُنع بعمليتنا الإبداعية المتكاملة — من تطوير المفهوم حتى التسليم النهائي.",
+        resultsEn: cs.resultsEn ?? "The work resonated deeply with audiences and amplified the message far beyond expectations.",
+        resultsAr: "لقي العمل صدى عميقًا لدى الجمهور وضخّم الرسالة إلى أبعد من المتوقع.",
+        category: cs.category,
+        metrics: cs.metrics,
+        externalLinks: cs.externalLinks,
+        order: cs.order,
+        status: Status.PUBLISHED,
+        publishedAt: new Date(),
+        authorId: admin.id,
+        heroMediaId: heroMediaId ?? null,
+      },
+    });
+
+    if (cs.gallery) {
+      for (const [i, img] of cs.gallery.entries()) {
+        const mediaId = await curatedMedia(img.file, img.alt);
+        await prisma.caseStudyMedia.create({
+          data: { caseStudyId: row.id, mediaId, order: i },
+        });
+      }
+    }
   }
 
   // --- Projects (a couple of additional portfolio items) ------------------

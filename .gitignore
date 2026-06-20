@@ -51,3 +51,18 @@ NinetyNile Profile for website TO SAMER copy.pdf
 
 # Raw PDF image dump — curate & optimize before committing selected assets
 public/media/from-pdf/
+
+# Hallmark skill cache
+.hallmark/
+
+# Licensed font source files (do not redistribute)
+/fonts/
+
+# Original logo source files (curated copies in public/brand/)
+/logos/
+
+# Raw PDF image extraction directory
+ninetynile pdf images/
+
+# Three.js environment textures (large HDR files)
+/public/textures/*.hdr

@@ -6,7 +6,7 @@ export const ui = {
     process: "Creative Process",
     production: "Production",
     experiences: "Brand Experiences",
-    tribe: "Our Tribe",
+    tribe: "Tribe",
     work: "Our Work",
     community: "Community",
     clients: "Clients",
@@ -84,15 +84,10 @@ export const ui = {
 export type Ui = typeof ui;
 
 export const navItems: ReadonlyArray<{ readonly href: string; readonly label: string }> = [
-  { href: "/", label: ui.nav.home },
   { href: "/about", label: ui.nav.about },
   { href: "/services", label: ui.nav.services },
-  { href: "/process", label: ui.nav.process },
-  { href: "/production", label: ui.nav.production },
   { href: "/work", label: ui.nav.work },
   { href: "/tribe", label: ui.nav.tribe },
   { href: "/clients", label: ui.nav.clients },
-  { href: "/community", label: ui.nav.community },
-  { href: "/experiences", label: ui.nav.experiences },
   { href: "/contact", label: ui.nav.contact },
 ];
