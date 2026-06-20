@@ -12,7 +12,9 @@ const getPublishedWork = unstable_cache(
     prisma.caseStudy.findMany({
       where: { status: "PUBLISHED" },
       orderBy: { order: "asc" },
-      include: { heroMedia: true },
+      include: {
+        heroMedia: { select: { path: true, altEn: true } },
+      },
     }),
   ["work-listing"],
   { tags: ["work"] },

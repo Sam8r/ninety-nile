@@ -24,6 +24,19 @@ interface InteractionState {
 // Low, warm dusk sun.
 const SUN_DIRECTION = new THREE.Vector3(0.25, 0.16, -0.72).normalize();
 const WATER_DISTORTION_BASE = 2.0;
+
+// Slow rolling swell. The same field displaces the water surface (in the Water
+// vertex shader) and lifts the camera, so the view floats on the waves.
+const SWELL_AMP = 0.9;
+function swellAtOrigin(t: number): number {
+  return (
+    (Math.sin(t * 1.0) * 0.6 +
+      Math.sin(-t * 0.8) * 0.5 +
+      Math.sin(t * 0.6) * 0.7 +
+      Math.sin(t * 0.3) * 0.6) *
+    SWELL_AMP
+  );
+}
 // Warm dusk haze the sea fades into at the horizon (matched to the sky).
 const HORIZON_HAZE = new THREE.Color("#d3c3bc");
 
@@ -129,7 +142,7 @@ function Ocean({
   const gl = useThree((s) => s.gl);
 
   const water = useMemo(() => {
-    const geometry = new THREE.PlaneGeometry(4000, 4000);
+    const geometry = new THREE.PlaneGeometry(4000, 4000, 160, 160);
     const waterNormals = new THREE.TextureLoader().load(
       "/textures/waternormals.jpg",
       (tex) => {
@@ -186,6 +199,27 @@ function Ocean({
         `vec3 outgoingLight = albedo;
          outgoingLight *= 1.0 + _hw*0.35 + _cw*0.45; // subtle cursor ripple only`,
       );
+
+    // --- Swell: displace the surface up/down so waves roll across the sea.
+    // Local +z maps to world up (the mesh is rotated -PI/2 on X).
+    mat.vertexShader = mat.vertexShader
+      .replace(
+        "void main() {",
+        `float swellHeight(vec2 p, float t){
+           float h = 0.0;
+           h += sin(p.x*0.040 + t*1.0) * 0.6;
+           h += sin(p.y*0.030 - t*0.8) * 0.5;
+           h += sin((p.x+p.y)*0.022 + t*0.6) * 0.7;
+           h += sin(t*0.30) * 0.6;            // overall level rise/fall
+           return h;
+         }
+         void main() {
+           vec3 dPos = position;
+           dPos.z += swellHeight(position.xy, time) * ${SWELL_AMP.toFixed(2)};`,
+      )
+      .replace("modelMatrix * vec4( position, 1.0 )", "modelMatrix * vec4( dPos, 1.0 )")
+      .replace("modelViewMatrix * vec4( position, 1.0 )", "modelViewMatrix * vec4( dPos, 1.0 )");
+
     mat.needsUpdate = true;
     return w;
   }, [gl]);
@@ -237,21 +271,22 @@ function Ocean({
   return <primitive object={water} />;
 }
 
-/** Gentle bob/sway as if drifting on a calm swell. */
+/** Rides the swell: the camera dips into troughs and lifts on crests, in sync
+ *  with the water surface (same time scale as the Water `time` uniform). */
 function CameraRig({ visibleRef }: { visibleRef: React.RefObject<boolean> }) {
   const cam = useThree((s) => s.camera);
   const t = useRef(0);
   useFrame((_, dt) => {
     if (!visibleRef.current) return;
-    t.current += dt;
+    t.current += dt * 0.6; // matches the Water time scale so it floats in sync
     const tt = t.current;
-    const bob = Math.sin(tt * 0.5);
+    const swell = swellAtOrigin(tt); // water level at the camera
     cam.position.set(
-      Math.sin(tt * 0.25) * 0.35,
-      5.2 + bob * 0.35,
-      10.5 + Math.sin(tt * 0.4) * 0.5,
+      Math.sin(tt * 0.4) * 0.45, // gentle lateral sway
+      5.2 + swell * 0.75, // dip & rise with the waves
+      10.5 + Math.sin(tt * 0.7) * 0.7,
     );
-    cam.lookAt(0, 11.5 + bob * 0.25, -90);
+    cam.lookAt(0, 11.5 + swell * 0.5, -90); // slight pitch as it rocks
   });
   return null;
 }

@@ -18,10 +18,12 @@ async function getCaseStudy(slug: string) {
       const study = await prisma.caseStudy.findUnique({
         where: { slug },
         include: {
-          heroMedia: true,
+          heroMedia: { select: { path: true, altEn: true } },
           galleryItems: {
             orderBy: { order: "asc" },
-            include: { media: true },
+            include: {
+              media: { select: { path: true, altEn: true } },
+            },
           },
         },
       });
