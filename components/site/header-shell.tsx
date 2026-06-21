@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-const DARK_HERO_ROUTES = ["/about", "/services", "/work"];
+const DARK_HERO_ROUTES = ["/about", "/services", "/work", "/tribe"];
 
 export function HeaderShell({ children }: { children: React.ReactNode }) {
   const [scrolled, setScrolled] = useState(false);

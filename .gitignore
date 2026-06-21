@@ -67,5 +67,7 @@ public/media/from-pdf/
 # Raw PDF image extraction directory
 ninetynile pdf images/
 
-# Three.js environment textures (large HDR files)
+# Three.js environment textures (large HDR files). The dusk sky the hero
+# actually loads is committed so the sky renders on a fresh deploy.
 /public/textures/*.hdr
+!/public/textures/sky-dusk.hdr
