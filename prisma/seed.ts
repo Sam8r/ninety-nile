@@ -1,13 +1,46 @@
 import { PrismaClient, Role, Status, CaseStudyCategory } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { promises as fs } from "node:fs";
+import path from "node:path";
+import sharp from "sharp";
 
 const prisma = new PrismaClient();
 
 type Metric = { labelEn: string; labelAr: string; value: string };
 type ExternalLink = { label: string; url: string };
 
+// Committed seed images → copied into the upload volume on seed so the site is
+// fully populated on a fresh server (MediaAssets + hardcoded /uploads/curated/*).
+const SEED_MEDIA_DIR = path.resolve(process.cwd(), "prisma/seed-media/curated");
+
+function uploadRoot(): string {
+  return path.resolve(process.cwd(), process.env.UPLOAD_DIR ?? "./uploads");
+}
+
+async function copyCuratedAssets(): Promise<void> {
+  const destDir = path.join(uploadRoot(), "curated");
+  await fs.mkdir(destDir, { recursive: true });
+  let files: string[];
+  try {
+    files = await fs.readdir(SEED_MEDIA_DIR);
+  } catch {
+    console.warn(`⚠️  ${SEED_MEDIA_DIR} not found — skipping image copy`);
+    return;
+  }
+  let n = 0;
+  for (const f of files) {
+    if (!/\.(jpe?g|png|webp|gif)$/i.test(f)) continue;
+    await fs.copyFile(path.join(SEED_MEDIA_DIR, f), path.join(destDir, f));
+    n++;
+  }
+  console.log(`🖼  copied ${n} curated images → ${destDir}`);
+}
+
 async function main() {
   console.log("🌱 Seeding NinetyNile…");
+
+  // Put curated images on disk first so MediaAssets + page images resolve.
+  await copyCuratedAssets();
 
   // --- Admin user ---------------------------------------------------------
   const adminEmail = process.env.ADMIN_EMAIL ?? "admin@ninetynile.com";
@@ -298,8 +331,32 @@ async function main() {
     const relPath = `curated/${filename}`;
     const existing = await prisma.mediaAsset.findFirst({ where: { path: relPath } });
     if (existing) return existing.id;
+
+    // Capture real dimensions/size from the copied file (best-effort).
+    let width = 0;
+    let height = 0;
+    let sizeBytes = 0;
+    try {
+      const buf = await fs.readFile(path.join(uploadRoot(), relPath));
+      sizeBytes = buf.byteLength;
+      const meta = await sharp(buf).metadata();
+      width = meta.width ?? 0;
+      height = meta.height ?? 0;
+    } catch {
+      console.warn(`⚠️  missing curated image: ${relPath}`);
+    }
+
     const asset = await prisma.mediaAsset.create({
-      data: { filename, path: relPath, mimeType: mime, kind: "IMAGE", altEn: alt, sizeBytes: BigInt(0) },
+      data: {
+        filename,
+        path: relPath,
+        mimeType: mime,
+        kind: "IMAGE",
+        altEn: alt,
+        width,
+        height,
+        sizeBytes: BigInt(sizeBytes),
+      },
     });
     return asset.id;
   }
