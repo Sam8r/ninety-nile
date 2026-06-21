@@ -55,8 +55,11 @@ public/media/from-pdf/
 # Hallmark skill cache
 .hallmark/
 
-# Licensed font source files (do not redistribute)
-/fonts/
+# Font source files. The PP Neue Machina weights the site builds with
+# (app/layout.tsx → next/font/local) are committed so the build works on
+# clone/CI; the rest of /fonts (Helvetica Neue, the original PP source) stays out.
+/fonts/*
+!/fonts/machina/
 
 # Original logo source files (curated copies in public/brand/)
 /logos/
